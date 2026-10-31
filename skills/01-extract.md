@@ -1,23 +1,28 @@
-# 00 Global rules (read every session)
+# 01 Extract (one JSON per paper -> data/papers/<id>.json)
 
-## Evidence
-1. Every factual claim about a paper = `{value, page, quote<=15 words}` or `NOT FOUND`. Never fill from memory.
-2. External numbers (citations, stars) = `{value, source, date_fetched}`. Never recalled; user supplies or a script fetches.
-3. Label anything that is my reasoning `[INFERENCE]`. Numbers in recommendations must trace to a paper page or to our own experiment logs.
-4. Numbers from different papers are comparable only if benchmark, model, and metric definition match; otherwise say "not comparable".
+Input: PDF at my_papers/<file>. Output: JSON below. Then update data/ledger.csv row and data/verified.json.
 
-## Token / effort discipline
-5. Read STATE.md first. Do only "Next actions". Do not scan directories; use data/ledger.csv as the index.
-6. Clone once per session: `git clone --depth 1 --filter=blob:none -b master <repo>`; fetch only needed PDFs (sparse checkout / `git show HEAD:path`). Use `git pull`, never re-clone.
-7. Each PDF is read once -> data/papers/<id>.json. Later stages read JSON only.
-8. Skip anything listed in data/verified.json for the same git_blob. Re-verify only if the blob changed.
-9. Batches of 3–5 papers. Stop and report at batch end; do not start the next stage unprompted.
-10. Ask the user only for things that block progress; state assumptions in one line otherwise.
-
-## Honesty
-11. Do not add papers to reach a count. If fewer than 10 pass screening, say so and propose how to find more.
-12. Flag low-confidence extractions (tables/figures) instead of smoothing over them.
-13. Ethics: attack only our own test apps/models in the lab setup. No attacks on third-party services.
-
-## End of session
-14. Update STATE.md (status, next 3 actions, decisions), list files to commit, one line each.
+```json
+{
+ "id":"P01","file":"","git_blob":"",
+ "meta":{"title":"","authors":[],"year":null,"venue":"","doi":"","pages":null},
+ "type":"attack | defense | benchmark | survey | system | other",
+ "problem":{"v":"","p":0,"q":""},
+ "main_idea":{"v":"","p":0,"q":""},
+ "threat_model":{"v":"","p":0,"q":""},
+ "injection_types_covered":[{"name":"","p":0,"q":""}],
+ "models_tested":[{"name":"","size":"","open_source":null,"p":0}],
+ "datasets_benchmarks":[{"name":"","size":"","url":"","p":0}],
+ "metrics":[{"name":"","definition":"","p":0}],
+ "results":[{"claim":"","number":"","setting":"","p":0,"q":""}],
+ "baselines":[],
+ "limitations_stated":[{"v":"","p":0,"q":""}],
+ "limitations_inferred":["[INFERENCE] ..."],
+ "artifacts":[{"kind":"code|data|other","url":"","p":0,"checked":null}],
+ "reusable_for_our_project":{"v":"","why":"[INFERENCE]"},
+ "confidence":"high|medium|low","flags":[]
+}
+```
+Rules: `NOT FOUND` for absent fields. `q` = verbatim quote (<=15 words) so the user can Ctrl+F it. Report numbers exactly as printed, with units and the setting they apply to.
+Artifacts: record URLs only; GitHub stats go in a later step (skills/02).
+Dedupe: compare DOI, then normalized title; list suspected duplicates in STATE.md for the user to approve.
