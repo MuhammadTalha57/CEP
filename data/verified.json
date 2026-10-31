@@ -1,0 +1,4 @@
+{
+  "_note": "key = git_blob of PDF; value = list of verified field names + date. Re-verify only if blob changes.",
+  "verified": {}
+}
