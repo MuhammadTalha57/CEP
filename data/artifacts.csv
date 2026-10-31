@@ -1,0 +1,6 @@
+paper,url,kind,stars_or_likes,forks_or_downloads,last_push,license,archived,fetched_at,notes
+P01,https://arxiv.org/pdf/2403.17710,other,,,,,,2026-10-31 11:34 UTC,not fetched (not GitHub/HF)
+P03,https://huggingface.co/datasets/hendzh/PromptShield,huggingface-dataset,9,1306,2025-04-07T17:15:28.000Z,apache-2.0,,2026-10-31 11:34 UTC,
+P03,https://github.com/wagner-group/PromptShield,github,4,0,2025-10-27T21:09:08Z,,False,2026-10-31 11:34 UTC,issues=0; lang=Python
+P06,https://github.com/Rrezeartaa/prompt-injection-attacksdetection,github,,,,,,2026-10-31 11:34 UTC,404 not found
+P08,https://github.com/google-research/camel-prompt-injection,github,414,64,2025-06-20T13:59:30Z,Apache-2.0,False,2026-10-31 11:34 UTC,issues=4; lang=Jupyter Notebook

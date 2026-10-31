@@ -1,0 +1,14 @@
+id,title,doi_used,openalex_cited_by,semanticscholar_citations,semanticscholar_influential,crossref_cited_by,fetched_at,notes
+P01,Optimization-based Prompt Injection Attack to LLM-as-a-Judge (JudgeDeceiver),10.1145/3658644.3690291,70,253,9,73,2026-10-31 11:34 UTC,
+P02,Neural Exec: Learning (and Learning from) Execution Triggers for Prompt Injection Attacks,10.1145/3689932.3694764,26,111,11,30,2026-10-31 11:34 UTC,
+P03,PromptShield: Deployable Detection for Prompt Injection Attacks,10.1145/3714393.3726501,31,88,11,32,2026-10-31 11:34 UTC,
+P04,Hidden-in-Plain-Text: A Benchmark for Social-Web Indirect Prompt Injection in RAG (OpenRAG-Soc),,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: HTTP 429
+P05,Analysis of LLMs Against Prompt Injection and Jailbreak Attacks,10.1145/3803628.3807972,2,3,0,2,2026-10-31 11:34 UTC,
+P06,A Real-Time Framework for Prompt Injection Attacks Detection on Cloud-Hosted Large Language Models,10.1109/FLLM67465.2025.11391009,2,1,0,2,2026-10-31 11:34 UTC,
+P07,An Edge-Cloud Collaborative Framework for Latency Optimization in Prompt Injection Defense,10.1109/SCECS69812.2026.11566062,0,0,0,0,2026-10-31 11:34 UTC,
+P08,Defeating Prompt Injections by Design (CaMeL),10.1109/SaTML68715.2026.00040,17,403,42,10,2026-10-31 11:34 UTC,
+P09,,,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: no doi
+P10,,,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: no doi
+P11,,,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: no doi
+P12,,,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: no doi
+P13,,,,,,,2026-10-31 11:34 UTC,openalex: no doi; s2: no doi
