@@ -56,6 +56,58 @@
         "dataset sizes",
         "table layouts (flagged)"
       ]
+    },
+    "53929419c61ba73da80d78febb38a9b7d9e344a5": {
+      "id": "P05",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "table layouts (flagged)"
+      ]
+    },
+    "63d51340408d368f417f0515e997898e6fcab604": {
+      "id": "P06",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "table layouts (flagged)"
+      ]
+    },
+    "6d95574193e16e79849bab53fccbfd178b93878b": {
+      "id": "P07",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "table layouts (flagged)"
+      ]
+    },
+    "556604d40daf0662b175fdd910a5e1381f12e02a": {
+      "id": "P08",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "table layouts (flagged)"
+      ]
     }
   }
 }

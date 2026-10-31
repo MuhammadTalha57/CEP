@@ -1,0 +1,111 @@
+{
+ "id": "P07",
+ "file": "An_EdgeCloud_Collaborative_Framework_for_Latency_Optimization_in_Prompt_Injection_Defense.pdf",
+ "git_blob": "6d95574193e16e79849bab53fccbfd178b93878b",
+ "meta": {
+  "title": "An Edge-Cloud Collaborative Framework for Latency Optimization in Prompt Injection Defense",
+  "authors": [
+   "Minyang Shen",
+   "Xinggang Fan",
+   "Haodong Zou",
+   "Ruihao Wang",
+   "Haiyang Huang"
+  ],
+  "year": 2026,
+  "venue": "IEEE SCECS 2026",
+  "doi": "10.1109/SCECS69812.2026.11566062",
+  "pages": 5
+ },
+ "type": "defense (system/latency, simulation)",
+ "problem": {
+  "v": "Cloud-side rechecking of suspicious prompts creates queueing and p99 latency spikes",
+  "p": 1,
+  "q": "cloud-side checking itself can become a queueing bottleneck"
+ },
+ "main_idea": {
+  "v": "Edge detector splits requests into low/medium/high risk; Q-TRiG queue-aware policy decides cloud recheck vs restricted mode for medium risk",
+  "p": 1,
+  "q": "enlarges the stable operating region under heavy load"
+ },
+ "threat_model": {
+  "v": "Input-side prompt injection against LLM services in edge-cloud deployments",
+  "p": 1,
+  "q": ""
+ },
+ "injection_types_covered": [],
+ "models_tested": [
+  {
+   "name": "MiniLM embeddings + Random Forest (edge); OpenAI embeddings + RF; DeBERTa (cloud recheck)",
+   "size": "",
+   "open_source": null,
+   "p": 3
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "Detector dataset (unnamed)",
+   "size": "NOT FOUND",
+   "url": "NOT FOUND",
+   "p": 3
+  }
+ ],
+ "metrics": [
+  {
+   "name": "Cloud queueing delay, p99 end-to-end latency, offloading ratio",
+   "definition": "discrete-event simulation",
+   "p": 4
+  }
+ ],
+ "results": [
+  {
+   "claim": "Edge detector accuracy RF: MiniLM 0.9533, OpenAI embeddings 0.9723",
+   "number": "0.9533 / 0.9723",
+   "setting": "Table I",
+   "p": 3,
+   "q": "",
+   "confidence": "medium"
+  },
+  {
+   "claim": "Risk split MiniLM: low 56.69%, mid 30.49%, high 12.82%",
+   "number": "56.69/30.49/12.82",
+   "setting": "",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "claim": "Q-TRiG keeps cloud waiting and p99 low across load 5-45 req/s while COR, EBG, S-TRiG diverge (shown in figures; no numeric speedups in text)",
+   "number": "qualitative",
+   "setting": "Poisson arrivals, 10 seeds, 20% warm-up discarded",
+   "p": 4,
+   "q": ""
+  }
+ ],
+ "baselines": [
+  "Cloud-Only Rechecking (COR)",
+  "Edge-Based Binary Gating (EBG)",
+  "Static three-stage gating (S-TRiG)"
+ ],
+ "limitations_stated": [],
+ "limitations_inferred": [
+  "[INFERENCE] Simulation only; no real LLM, attack traffic or security-effectiveness measurement",
+  "[INFERENCE] No code/dataset link found"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Idea: route medium-risk requests to a restricted execution mode (no tools, limited context, safe template)",
+  "p": 4,
+  "q": "disabling tool use, restricting context sources, or returning a safe template"
+ },
+ "confidence": "medium",
+ "flags": [
+  "Main results are in figures; extract numbers manually if cited",
+  "Low direct relevance to attack evaluation; moderate for defense design"
+ ]
+}

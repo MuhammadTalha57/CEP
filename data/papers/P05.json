@@ -1,0 +1,209 @@
+{
+ "id": "P05",
+ "file": "3803628.3807972.pdf",
+ "git_blob": "53929419c61ba73da80d78febb38a9b7d9e344a5",
+ "meta": {
+  "title": "Analysis of LLMs Against Prompt Injection and Jailbreak Attacks",
+  "authors": [
+   "Piyush Jaiswal",
+   "Aaditya Pratap",
+   "Shreyansh Saraswati",
+   "Harsh Kasyap",
+   "Somanath Tripathy"
+  ],
+  "year": 2026,
+  "venue": "LM-SHIELD '26 workshop (ACM), Bangalore",
+  "doi": "10.1145/3803628.3807972",
+  "pages": 12
+ },
+ "type": "attack+defense evaluation (empirical)",
+ "problem": {
+  "v": "Vulnerability of small/medium open-source LLMs to prompt injection and jailbreaks, and whether lightweight inference-time defences help without retraining",
+  "p": 1,
+  "q": "empirically investigates vulnerabilities in open-source LLMs related to prompt injection"
+ },
+ "main_idea": {
+  "v": "Evaluate 10 open-source LLMs on 91 injection + 74 jailbreak prompts, then 5 inference-time defences on 6 models; human-judged vulnerability",
+  "p": 3,
+  "q": "10 open-source LLMs across 91 prompt injection and 74 jailbreak attack scenarios"
+ },
+ "threat_model": {
+  "v": "Black-box prompting of locally runnable open models; no retraining; resource-constrained deployments",
+  "p": 1,
+  "q": ""
+ },
+ "injection_types_covered": [
+  {
+   "name": "Unrestricted execution",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Override tool injection",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Section/role override",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Context reset manipulation",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Identity manipulation",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Prompt injection (91 prompts)",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Jailbreak (74 prompts)",
+   "p": 8,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "phi3:3.8b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  },
+  {
+   "name": "Mistral:7b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  },
+  {
+   "name": "DeepSeek-R1:1.5b / 7b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  },
+  {
+   "name": "Llama3.2:1b / 3b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  },
+  {
+   "name": "qwen3:1.7b / 4b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  },
+  {
+   "name": "gemma3:1b / 4b",
+   "size": "",
+   "open_source": true,
+   "p": 1
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "Curated adversarial prompts (Reddit, Discord, GitHub repos, public datasets, papers)",
+   "size": "91 injection + 74 jailbreak",
+   "url": "NOT FOUND",
+   "p": 4
+  }
+ ],
+ "metrics": [
+  {
+   "name": "Vulnerability rate (%) judged by humans; timeouts and empty responses tracked",
+   "definition": "denominator inconsistent, see flags",
+   "p": 7
+  }
+ ],
+ "results": [
+  {
+   "claim": "Prompt-injection vulnerability: qwen3:1.7b 71.3%, gemma3:1b 62.8%, DeepSeek-R1:1.5b 34.0%, Llama3.2:1b 30.9%; six larger models 0%",
+   "number": "71.3/62.8/34.0/30.9/0",
+   "setting": "91 prompts, no defence",
+   "p": 7,
+   "q": "",
+   "confidence": "medium (model order in flattened Table 3 inferred)"
+  },
+  {
+   "claim": "Jailbreak (74 prompts) vulnerable counts: gemma3:1b 49, Llama3.2:3b 36, qwen3:1.7b 8, Llama3.2:1b 7, DeepSeek-R1:1.5b 1, qwen3:4b 0",
+   "number": "49/36/8/7/1/0",
+   "setting": "no defence",
+   "p": 9,
+   "q": "DeepSeek-R1:1.5B is the most robust, with only 1.37% vulnerability"
+  },
+  {
+   "claim": "0% injection vulnerability does not imply jailbreak robustness",
+   "number": "Llama3.2:3B 0% injection vs 69.2% jailbreak",
+   "setting": "",
+   "p": 11,
+   "q": "Llama3.2:3B showed 0% injection vulnerability but 69.2% jailbreak vulnerability"
+  },
+  {
+   "claim": "Defence ranking: Self-Defence best; Input Filtering weakest (Llama3.2 3B ~42% vulnerable); System Prompt inconsistent (~39% for Llama3.2 3B); Vector 25-30%; Voting 13-15% on small models",
+   "number": "best 1.2% (self-defence)",
+   "setting": "165 prompts x 6 models x 5 defences",
+   "p": 10,
+   "q": "Input Filtering emerges as the weakest defence"
+  },
+  {
+   "claim": "Weak judge models weaken Self-Defence",
+   "number": "up to 49.7% unsafe outputs approved",
+   "setting": "Gemma3:1B as judge",
+   "p": 11,
+   "q": "Weak judge models (e.g., Gemma3:1B) approve up to 49.7% of unsafe outputs"
+  }
+ ],
+ "baselines": [
+  "no defence",
+  "Self-Defence",
+  "Input filtering",
+  "System prompt defence",
+  "Vector defence",
+  "Voting defence"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Defences are bypassed by long reasoning-heavy prompts",
+   "p": 1,
+   "q": "consistently bypassed by long, reasoning-heavy prompts"
+  },
+  {
+   "v": "Jailbreak/defended runs limited to fewer models due to instability and compute",
+   "p": 8,
+   "q": ""
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Direct prompting only; no RAG/indirect injection, tools, or cloud deployment",
+  "[INFERENCE] Rates lack confidence intervals; denominators inconsistent (see flags)",
+  "[INFERENCE] Closest prior work to our brief; our novelty must differ (RAG/tool apps, CIs, deterministic success checks, cloud deployment)"
+ ],
+ "artifacts": [
+  {
+   "kind": "data",
+   "url": "NOT FOUND",
+   "p": 3,
+   "checked": null,
+   "note": "paper claims public release of dataset; no URL found in text"
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Model shortlist known to run on modest hardware (Llama3.2 1b/3b, qwen3, gemma3, DeepSeek-R1 1.5b, phi3, Mistral 7b); five defence baselines to re-implement; attack categories",
+  "p": 1,
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "Table 3 labelled /91 but 67 vulnerable -> 71.3% implies denominator 94 (67/91=73.6%)",
+  "Jailbreak rates use inconsistent denominators (gemma3:1b ~67%=49/74; Llama3.2:3B 69.2%=36/52 completed)",
+  "Dataset release URL not found",
+  "Judged by humans (p12) - no inter-rater stats found"
+ ]
+}

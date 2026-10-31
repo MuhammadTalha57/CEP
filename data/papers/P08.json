@@ -1,0 +1,158 @@
+{
+ "id": "P08",
+ "file": "Defeating_Prompt_Injections_by_Design.pdf",
+ "git_blob": "556604d40daf0662b175fdd910a5e1381f12e02a",
+ "meta": {
+  "title": "Defeating Prompt Injections by Design (CaMeL)",
+  "authors": [
+   "Edoardo Debenedetti",
+   "Ilia Shumailov",
+   "Tianqi Fan",
+   "Jamie Hayes",
+   "Nicholas Carlini",
+   "Daniel Fabian",
+   "Christoph Kern",
+   "Chongyang Shi",
+   "Andreas Terzis",
+   "Florian Tramèr"
+  ],
+  "year": 2026,
+  "venue": "IEEE SaTML 2026",
+  "doi": "10.1109/SaTML68715.2026.00040",
+  "pages": 32
+ },
+ "type": "defense (system design)",
+ "problem": {
+  "v": "LLM agents hijacked by prompt injection when processing untrusted data",
+  "p": 1,
+  "q": ""
+ },
+ "main_idea": {
+  "v": "Extract control/data flow from the trusted query; custom Python interpreter with provenance tags and policies; privileged vs quarantined LLM",
+  "p": 1,
+  "q": "untrusted data retrieved by the LLM can never affect the program flow"
+ },
+ "threat_model": {
+  "v": "Untrusted tool outputs/web content injected into agent context",
+  "p": 1,
+  "q": ""
+ },
+ "injection_types_covered": [
+  {
+   "name": "Agent tool-output injection (AgentDojo)",
+   "p": 1,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "gemini-2.5-flash / pro",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  },
+  {
+   "name": "claude-3.5-haiku",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  },
+  {
+   "name": "claude-sonnet-4",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  },
+  {
+   "name": "gpt-4.1",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  },
+  {
+   "name": "o4-mini",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  },
+  {
+   "name": "o3",
+   "size": "",
+   "open_source": false,
+   "p": 7
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "AgentDojo",
+   "size": "NOT FOUND",
+   "url": "NOT FOUND",
+   "p": 1
+  }
+ ],
+ "metrics": [
+  {
+   "name": "Utility (task success), successful attacks, token overhead",
+   "definition": "",
+   "p": 7
+  }
+ ],
+ "results": [
+  {
+   "claim": "Solves 77% of AgentDojo tasks with security guarantees vs 84% undefended",
+   "number": "77% vs 84%",
+   "setting": "abstract",
+   "p": 1,
+   "q": "solving 77% of tasks in AgentDojo with security guarantees"
+  },
+  {
+   "claim": "Token overhead for median task",
+   "number": "2.82x input, 2.73x output",
+   "setting": "Claude 3.5 Sonnet backbone",
+   "p": 11,
+   "q": "requires 2.82× input tokens and 2.73× more output tokens for the median task"
+  },
+  {
+   "claim": "Utility drop examples (native -> CaMeL): Claude 4 Sonnet 83.5% -> 70.1%; Gemini 2.5 Flash 55.7% -> 35.1%",
+   "number": "-13.4 / -20.6 pts",
+   "setting": "Table I",
+   "p": 16,
+   "q": "",
+   "confidence": "medium"
+  }
+ ],
+ "baselines": [
+  "native tool-calling API",
+  "CaMeL without policies",
+  "spotlighting and others in appendix"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Utility reduced in some suites (notably Travel) and cost overhead",
+   "p": 7,
+   "q": ""
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Evaluated on proprietary frontier models; behaviour with small local models untested",
+  "[INFERENCE] Requires agentic tool setting; not applicable as-is to plain chat or RAG apps"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "https://github.com/google-research/camel-prompt-injection",
+   "p": 1,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Design pattern for a defense on our tool-calling app (App C): plan from trusted query only, treat tool output as data, enforce simple policies; cite its cost overhead",
+  "p": 4,
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "32 pages: only abstract, evaluation setup, Table I and overhead read",
+  "Which model is the first row in Table I not confirmed"
+ ]
+}
