@@ -1,0 +1,160 @@
+{
+ "id": "P04",
+ "file": "3774904.3792853.pdf",
+ "git_blob": "fa321bdf8afaa2703f081af984537471bf854b32",
+ "meta": {
+  "title": "Hidden-in-Plain-Text: A Benchmark for Social-Web Indirect Prompt Injection in RAG (OpenRAG-Soc)",
+  "authors": [
+   "Haoze Guo",
+   "Ziqi Wei"
+  ],
+  "year": 2026,
+  "venue": "ACM Web Conference (WWW) 2026",
+  "doi": "NOT FOUND",
+  "pages": 4
+ },
+ "type": "benchmark",
+ "problem": {
+  "v": "No compact Web-centric RAG benchmark for HTML/accessibility/Unicode injection carriers",
+  "p": 1,
+  "q": "a compact, Web-centric RAG benchmark covering HTML/accessibility/Unicode carriers"
+ },
+ "main_idea": {
+  "v": "Reproducible ingest-retrieve-generate harness with injection carriers and three deployable defenses (sanitize, Unicode-normalize, attribution-gated answering)",
+  "p": 1,
+  "q": ""
+ },
+ "threat_model": {
+  "v": "Attacker controls some Web pages that get ingested; knows markup carriers, not weights or prompts",
+  "p": 1,
+  "q": "control of a subset of Web pages that are then ingested"
+ },
+ "injection_types_covered": [
+  {
+   "name": "Hidden spans",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "name": "Off-screen CSS",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "name": "Alt text",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "name": "ARIA",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "name": "Zero-width characters",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "name": "Retrieval poisoning (rank shift)",
+   "p": 3,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "Generator LLM",
+   "size": "NOT FOUND",
+   "open_source": null,
+   "p": 0,
+   "note": "not named in searched text"
+  },
+  {
+   "name": "BM25 + dense (E5/Contriever-like) retrievers",
+   "size": "",
+   "open_source": true,
+   "p": 2
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "OpenRAG-Soc corpus; real-web subset N=2350 pages",
+   "size": "2350 (real-web)",
+   "url": "NOT FOUND",
+   "p": 4
+  }
+ ],
+ "metrics": [
+  {
+   "name": "IPI ASR, ΔMRR@10, ΔnDCG@10, utility (answerability), latency",
+   "definition": "p1",
+   "p": 1
+  }
+ ],
+ "results": [
+  {
+   "claim": "Macro-avg ASR by defense: Vanilla 24.9, Sanitized 13.1, Normalized 21.3, All defenses 4.7 (95% CIs reported)",
+   "number": "24.9 -> 4.7",
+   "setting": "benchmark",
+   "p": 3,
+   "q": "",
+   "confidence": "medium (column order inferred)"
+  },
+  {
+   "claim": "Real-web static ASR: Vanilla 22.7, Normalized 19.1, Sanitized 12.0, All 4.3; adaptive: 28.9, 22.2, 15.8, 5.4",
+   "number": "22.7->4.3 / 28.9->5.4",
+   "setting": "N=2350",
+   "p": 4,
+   "q": ""
+  },
+  {
+   "claim": "ASR detector validated on 1200 generations",
+   "number": "P=0.92 R=0.89 F1=0.90 kappa=0.84",
+   "setting": "3 raters",
+   "p": 3,
+   "q": ""
+  },
+  {
+   "claim": "Utility cost of Sanitized+Normalized",
+   "number": "answerability -1.8pp / -2.2pp",
+   "setting": "",
+   "p": 3,
+   "q": ""
+  }
+ ],
+ "baselines": [
+  "Vanilla",
+  "Sanitized",
+  "Normalized",
+  "All defenses"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Attribution gating can miss paraphrases beyond cited spans",
+   "p": 4,
+   "q": "Attribution can miss paraphrases that exceed cited spans"
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Generator model unnamed and no repo link found, so reproducibility is unclear; only 4 pages",
+  "[INFERENCE] Per-carrier table not parsed reliably; use macro numbers or read p3 manually"
+ ],
+ "artifacts": [
+  {
+   "kind": "code/data",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Direct template for our RAG test app: same carriers (hidden/CSS/alt/ARIA/zero-width), ASR metric, and the sanitize+normalize+attribution defense stack to reimplement in Python",
+  "p": 2,
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "Git blob for P04 taken from ledger pending check",
+  "Generator LLM and repo not found"
+ ]
+}

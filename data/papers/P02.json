@@ -1,0 +1,151 @@
+{
+ "id": "P02",
+ "file": "3689932.3694764.pdf",
+ "git_blob": "2d852b2c5f8f6516d95e1e2881511c3ea02c25ab",
+ "meta": {
+  "title": "Neural Exec: Learning (and Learning from) Execution Triggers for Prompt Injection Attacks",
+  "authors": [
+   "Dario Pasquini",
+   "Martin Strohmeier",
+   "Carmela Troncoso"
+  ],
+  "year": 2024,
+  "venue": "ACM AISec 2024",
+  "doi": "10.1145/3689932.3694764",
+  "pages": 12
+ },
+ "type": "attack",
+ "problem": {
+  "v": "Handcrafted injection triggers are limited; can triggers be learned automatically?",
+  "p": 1,
+  "q": "conceptualize the creation of execution triggers as a differentiable search problem"
+ },
+ "main_idea": {
+  "v": "Learn execution triggers (e.g., 15+5 token inline triggers) by gradient-based search; triggers persist through RAG chunking",
+  "p": 1,
+  "q": ""
+ },
+ "threat_model": {
+  "v": "White-box access to an open-source target LLM; attacker controls a single input entry",
+  "p": 3,
+  "q": "white-box access is available to"
+ },
+ "injection_types_covered": [
+  {
+   "name": "Learned execution trigger (inline)",
+   "p": 1,
+   "q": ""
+  },
+  {
+   "name": "Handcrafted triggers (12 baselines)",
+   "p": 7,
+   "q": ""
+  },
+  {
+   "name": "RAG-persisting trigger",
+   "p": 9,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "Mistral-7B",
+   "size": "7B",
+   "open_source": true,
+   "p": 2
+  },
+  {
+   "name": "OpenChat-3.5",
+   "size": "7B",
+   "open_source": true,
+   "p": 2
+  },
+  {
+   "name": "Llama-3-8B",
+   "size": "8B",
+   "open_source": true,
+   "p": 2
+  },
+  {
+   "name": "Mixtral-8x7B",
+   "size": "47B total",
+   "open_source": true,
+   "p": 2
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "Own test set: 100 prompts+payloads, disjoint from training",
+   "size": "100",
+   "url": "NOT FOUND",
+   "p": 7
+  }
+ ],
+ "metrics": [
+  {
+   "name": "ExeAcc (Execution Top-1 accuracy), binary success of injection",
+   "definition": "see Sec 4",
+   "p": 7
+  }
+ ],
+ "results": [
+  {
+   "claim": "Triggers for Llama-3 reach ~95% attack success",
+   "number": "~95%",
+   "setting": "abstract",
+   "p": 2,
+   "q": "forge triggers with ∼ 95% attack success rate"
+  },
+  {
+   "claim": "Neural Exec at least 2x best handcrafted baseline; mean accuracy 91% across models",
+   "number": "91%",
+   "setting": "12 handcrafted baselines",
+   "p": 8,
+   "q": "at least twice as effective as the best baseline trigger"
+  },
+  {
+   "claim": "RAG chunk size 500 chars: trigger persistence",
+   "number": "80% average",
+   "setting": "RAG simulation to retrieval phase",
+   "p": 9,
+   "q": "average persistence of 80%"
+  }
+ ],
+ "baselines": [
+  "12 handcrafted execution triggers (p7)"
+ ],
+ "limitations_stated": [
+  {
+   "v": "OpenChat-3.5 was unusually resilient to the baseline triggers",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "v": "Suggested mitigation: sanitize special formatting tags from user input",
+   "p": 10,
+   "q": "sanitize user-originated inputs from any special formatting tag"
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] White-box optimization needs GPU; not reproducible for us",
+  "[INFERENCE] Learned triggers often use chat-template/bracket/comment tokens (see Fig 1, p1) - hand-built analogues can be tested without optimization"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null,
+   "note": "no repo/dataset link found in text search"
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Motivates a 'formatting-token/comment-tag' payload class and a sanitization defense; use its metric idea (binary execution success)",
+  "p": 10,
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "Release of code/triggers not found; check paper intro/appendix manually"
+ ]
+}

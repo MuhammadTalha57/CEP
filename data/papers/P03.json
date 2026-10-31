@@ -1,0 +1,148 @@
+{
+ "id": "P03",
+ "file": "3714393.3726501.pdf",
+ "git_blob": "21fbdc6c1242c5f272711af1814ef9b5f5863e4e",
+ "meta": {
+  "title": "PromptShield: Deployable Detection for Prompt Injection Attacks",
+  "authors": [
+   "Dennis Jacob",
+   "Hend Alzahrani",
+   "Zhanhao Hu",
+   "Basel Alomair",
+   "David Wagner"
+  ],
+  "year": 2025,
+  "venue": "ACM CODASPY 2025",
+  "doi": "10.1145/3714393.3726501 (derived from filename; verify)",
+  "pages": 12
+ },
+ "type": "defense",
+ "problem": {
+  "v": "Existing injection detectors have too many false positives for deployment",
+  "p": 1,
+  "q": "deployable prompt injection detector needs to have an extremely low false positive rate"
+ },
+ "main_idea": {
+  "v": "Benchmark of conversational and application-structured data + fine-tuned detector evaluated at low-FPR thresholds",
+  "p": 1,
+  "q": ""
+ },
+ "threat_model": {
+  "v": "Detector monitors all inputs to an LLM-integrated app; adversary controls part of processed data",
+  "p": 1,
+  "q": ""
+ },
+ "injection_types_covered": [
+  {
+   "name": "Injection attacks incl. HackAPrompt and FourAttacks sets",
+   "p": 6,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "DeBERTa-v3-base",
+   "size": "184M",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "FLAN-T5-small/base/large",
+   "size": "61M/223M/751M",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "Llama-3.2-1B-Instruct",
+   "size": "1B",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "Llama-3.1-8B-Instruct",
+   "size": "8B",
+   "open_source": true,
+   "p": 8
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "PromptShield benchmark",
+   "size": "NOT FOUND",
+   "url": "https://huggingface.co/datasets/hendzh/PromptShield",
+   "p": 2
+  }
+ ],
+ "metrics": [
+  {
+   "name": "AUC, TPR at fixed FPR (1%, 0.5%, 0.1%, 0.05%)",
+   "definition": "deployment scheme picks thresholds at target FPR",
+   "p": 7
+  }
+ ],
+ "results": [
+  {
+   "claim": "PromptShield Llama-3.1-8B vs DeBERTa-184M vs PromptGuard (TPR@FPR1%)",
+   "number": "94.80% / 43.22% / 12.78%",
+   "setting": "low-FPR eval",
+   "p": 9,
+   "q": "",
+   "confidence": "medium (table flattened)"
+  },
+  {
+   "claim": "TPR@FPR0.1%: Llama-3.1-8B 65.33%, DeBERTa-184M 31.45%, PromptGuard 9.39%; AUC 0.998 / 0.976 / 0.874",
+   "number": "see claim",
+   "setting": "",
+   "p": 9,
+   "q": "",
+   "confidence": "medium (table flattened)"
+  },
+  {
+   "claim": "Bigger base models detect better",
+   "number": "see Table 5",
+   "setting": "",
+   "p": 9,
+   "q": "Larger models perform significantly better"
+  }
+ ],
+ "baselines": [
+  "PromptGuard (279M)",
+  "ProtectAI v1 / v2 (184M)",
+  "InjecGuard (184M)",
+  "Fmops (67M)"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Decision threshold was calibrated on test data instead of validation split",
+   "p": 7,
+   "q": "we should have used the validation split for this calibration step"
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] 8B detector is too heavy for CPU-only; 184M DeBERTa variant is the feasible one for us"
+ ],
+ "artifacts": [
+  {
+   "kind": "data",
+   "url": "https://huggingface.co/datasets/hendzh/PromptShield",
+   "p": 2,
+   "checked": null
+  },
+  {
+   "kind": "code",
+   "url": "https://github.com/wagner-group/PromptShield",
+   "p": 2,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Reuse as (a) defense baseline (public detectors e.g. ProtectAI DeBERTa v2 on HF, p11 ref) and (b) benchmark prompts for evaluation; report TPR@low-FPR for our defense",
+  "p": "2,9",
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "DOI inferred from filename",
+  "Dataset size not extracted"
+ ]
+}

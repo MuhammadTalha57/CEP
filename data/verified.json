@@ -1,4 +1,61 @@
 {
-  "_note": "key = git_blob of PDF; value = list of verified field names + date. Re-verify only if blob changes.",
-  "verified": {}
+  "_note": "key=git_blob. 'checked'=fields compared with PDF text on that date; 'unchecked'=not yet. Re-verify only if blob changes.",
+  "verified": {
+    "663aaed8bac944291e62e4ad8f99d66c1e45eba2": {
+      "id": "P01",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "dataset sizes",
+        "table layouts (flagged)"
+      ]
+    },
+    "2d852b2c5f8f6516d95e1e2881511c3ea02c25ab": {
+      "id": "P02",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "dataset sizes",
+        "table layouts (flagged)"
+      ]
+    },
+    "21fbdc6c1242c5f272711af1814ef9b5f5863e4e": {
+      "id": "P03",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "dataset sizes",
+        "table layouts (flagged)"
+      ]
+    },
+    "fa321bdf8afaa2703f081af984537471bf854b32": {
+      "id": "P04",
+      "date": "2026-10-31",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs"
+      ],
+      "unchecked": [
+        "code release",
+        "dataset sizes",
+        "table layouts (flagged)"
+      ]
+    }
+  }
 }

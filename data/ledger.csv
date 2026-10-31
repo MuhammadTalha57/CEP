@@ -1,8 +1,8 @@
 id,file,git_blob,bytes,title,doi,year,venue,status,relevance_0_5,decision,reason
-P01,3658644.3690291.pdf,663aaed8bac944291e62e4ad8f99d66c1e45eba2,1410937,,,,,pending,,,
-P02,3689932.3694764.pdf,2d852b2c5f8f6516d95e1e2881511c3ea02c25ab,2318913,,,,,pending,,,
-P03,3714393.3726501.pdf,21fbdc6c1242c5f272711af1814ef9b5f5863e4e,1845783,,,,,pending,,,
-P04,3774904.3792853.pdf,fa321bdf8afaa2703f081af984537471bf854b32,1112814,,,,,pending,,,
+P01,3658644.3690291.pdf,663aaed8bac944291e62e4ad8f99d66c1e45eba2,1410937,Optimization-based Prompt Injection Attack to LLM-as-a-Judge (JudgeDeceiver),10.1145/3658644.3690291,2024,ACM CCS 2024,extracted,,,
+P02,3689932.3694764.pdf,2d852b2c5f8f6516d95e1e2881511c3ea02c25ab,2318913,Neural Exec: Learning (and Learning from) Execution Triggers for Prompt Injection Attacks,10.1145/3689932.3694764,2024,ACM AISec 2024,extracted,,,
+P03,3714393.3726501.pdf,21fbdc6c1242c5f272711af1814ef9b5f5863e4e,1845783,PromptShield: Deployable Detection for Prompt Injection Attacks,10.1145/3714393.3726501 (derived from filename; verify),2025,ACM CODASPY 2025,extracted,,,
+P04,3774904.3792853.pdf,fa321bdf8afaa2703f081af984537471bf854b32,1112814,Hidden-in-Plain-Text: A Benchmark for Social-Web Indirect Prompt Injection in RAG (OpenRAG-Soc),NOT FOUND,2026,ACM Web Conference (WWW) 2026,extracted,,,
 P05,3803628.3807972.pdf,53929419c61ba73da80d78febb38a9b7d9e344a5,660815,,,,,pending,,,
 P06,A_Real-Time_Framework_for_Prompt_Injection_Attacks_Detection_on_Cloud-Hosted_Large_Language_Models.pdf,63d51340408d368f417f0515e997898e6fcab604,960454,,,,,pending,,,
 P07,An_EdgeCloud_Collaborative_Framework_for_Latency_Optimization_in_Prompt_Injection_Defense.pdf,6d95574193e16e79849bab53fccbfd178b93878b,1177427,,,,,pending,,,

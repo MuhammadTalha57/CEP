@@ -1,0 +1,187 @@
+{
+ "id": "P01",
+ "file": "3658644.3690291.pdf",
+ "git_blob": "663aaed8bac944291e62e4ad8f99d66c1e45eba2",
+ "meta": {
+  "title": "Optimization-based Prompt Injection Attack to LLM-as-a-Judge (JudgeDeceiver)",
+  "authors": [
+   "Jiawen Shi",
+   "Zenghui Yuan",
+   "Yinuo Liu",
+   "Yue Huang",
+   "Pan Zhou",
+   "Lichao Sun",
+   "Neil Zhenqiang Gong"
+  ],
+  "year": 2024,
+  "venue": "ACM CCS 2024",
+  "doi": "10.1145/3658644.3690291",
+  "pages": 15
+ },
+ "type": "attack",
+ "problem": {
+  "v": "Attacker-crafted candidate response hijacks an LLM-as-a-Judge into selecting it",
+  "p": 1,
+  "q": "select the best response from a set of candidates for a given question"
+ },
+ "main_idea": {
+  "v": "Gradient-based optimization of an injected token sequence (JudgeDeceiver)",
+  "p": 1,
+  "q": "formulate finding such sequence as an optimization problem and propose a gradient based method"
+ },
+ "threat_model": {
+  "v": "Judge uses open-source LLM (white-box access to optimize sequence)",
+  "p": 4,
+  "q": "LLM-as-a-Judge employs open-source LLMs"
+ },
+ "injection_types_covered": [
+  {
+   "name": "Naive attack",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Escape characters",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Content ignore",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Fake completion",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Combined attack",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Fake reasoning",
+   "p": 8,
+   "q": ""
+  },
+  {
+   "name": "Optimization-based (JudgeDeceiver)",
+   "p": 8,
+   "q": ""
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "Mistral-7B-Instruct",
+   "size": "7B",
+   "open_source": true,
+   "p": 6
+  },
+  {
+   "name": "Openchat-3.5",
+   "size": "7B",
+   "open_source": true,
+   "p": 6
+  },
+  {
+   "name": "Llama-2-7B-chat",
+   "size": "7B",
+   "open_source": true,
+   "p": 6
+  },
+  {
+   "name": "Llama-3-8B",
+   "size": "8B",
+   "open_source": true,
+   "p": 6
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "MT-Bench",
+   "size": "NOT FOUND",
+   "url": "NOT FOUND",
+   "p": 6,
+   "note": "eight domains, 6 responses per question"
+  },
+  {
+   "name": "LLMBar",
+   "size": "NOT FOUND",
+   "url": "NOT FOUND",
+   "p": 6
+  }
+ ],
+ "metrics": [
+  {
+   "name": "ACC, ASR-B, ASR, PAC (positional attack consistency)",
+   "definition": "see paper Sec 4.1.4",
+   "p": 6
+  }
+ ],
+ "results": [
+  {
+   "claim": "Average ASR / PAC on MT-Bench with Mistral-7B",
+   "number": "90.8% / 83.4%",
+   "setting": "JudgeDeceiver",
+   "p": 3,
+   "q": "the average attack success rate is 90.8%, and positional attack consistency is 83.4%"
+  },
+  {
+   "claim": "Manual attacks on Mistral-7B MT-Bench (ASR): naive 7.3, escape 12.8, content-ignore 7.8, fake-completion 7.7, combined 12.8, fake-reasoning 16.3",
+   "number": "7.3%-16.3% vs 90.8%",
+   "setting": "MT-Bench, Mistral-7B",
+   "p": 8,
+   "q": "",
+   "confidence": "medium (table layout parsed from text)"
+  },
+  {
+   "claim": "Known-answer detection fails to flag the attack",
+   "number": "FNR 100% (MT-Bench), 90% (LLMBar)",
+   "setting": "Mistral-7B",
+   "p": 13,
+   "q": "the FNRs are 100% and 90% on the two datasets"
+  },
+  {
+   "claim": "Perplexity (PPL/PPL-W) detection misses many attacks",
+   "number": "FNR 40-80% MT-Bench; 60-90% LLMBar",
+   "setting": "",
+   "p": 13,
+   "q": "the FNRs range from 40% to 80% on MTBench"
+  }
+ ],
+ "baselines": [
+  "six manual prompt-injection methods (p3)",
+  "jailbreak attacks adapted to the task (p3)"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Stealth against perplexity detection only partial; authors list improving stealth and new defenses as future work",
+   "p": 13,
+   "q": "some stealthiness against perplexity-based detection"
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Needs white-box gradients on open models (GPU-heavy); not reproducible in our no-GPU setting",
+  "[INFERENCE] Target is LLM-as-a-Judge, not a general chat/RAG app, so ASR values don't transfer directly"
+ ],
+ "artifacts": [
+  {
+   "kind": "other",
+   "url": "https://arxiv.org/pdf/2403.17710",
+   "p": 4,
+   "checked": null,
+   "note": "arXiv version with appendix; code link: NOT FOUND in text"
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Use its manual-attack taxonomy (naive, escape chars, context ignore, fake completion, combined, fake reasoning) as direct-injection test types; cite its ASR numbers as reference points",
+  "p": 8,
+  "q": ""
+ },
+ "confidence": "medium",
+ "flags": [
+  "Per-attack numbers read from a flattened table; spot-check p8 Table 2 before citing in the paper",
+  "Code release not located"
+ ]
+}
