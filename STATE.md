@@ -13,7 +13,7 @@
 |---|-------|--------|-------|
 | 0 | Scaffold | DONE | |
 | 1 | Extract 13 papers | IN PROGRESS | P01–P08 done; P09–P13 todo |
-| 2 | Rank + exclude | TODO | citations optional (see decision D1) |
+| 2 | Rank + exclude | TODO | needs data/citations.csv + artifacts.csv (GitHub Action) |
 | 3 | Gap analysis | TODO | |
 | 4 | Experiment design + harness | TODO | |
 | 5 | Local runs (user) | TODO | |
@@ -25,12 +25,12 @@
 1–2 Nov: finish extraction + ranking · 2–3 Nov: gaps + experiment design + harness code · 3–6 Nov: runs, defense, results · 6–8 Nov: AWS deploy + paper · 9 Nov: submit. Cut scope before cutting experiments.
 
 ## Next actions (max 3)
-1. User: commit `data/papers/P05–P08.json`, `data/ledger.csv`, `data/verified.json`, `paper/facts.md`, this file.
-2. Claude: extract P09–P13 (skills/01), then run stage 2 ranking (skills/02).
-3. User: confirm D1 (skip citation counts).
+1. User: add `scripts/fetch_metrics.py` and `.github/workflows/metrics.yml`; commit; then GitHub > Actions > "Fetch metrics" > Run workflow. It commits data/citations.csv and data/artifacts.csv.
+2. Claude: extract P09–P13 (skills/01), read the two CSVs, then rank (skills/02).
+3. User: after P09–P13 are committed, run the workflow again (it is safe to re-run).
 
 ## Decisions log
-- 31 Oct — D1 (proposed, needs OK): skip citation-count fetching to save time; rank on relevance/rigor/artifacts/recency only.
+- 31 Oct — D1 REVERSED by user: citation counts ARE required. Fetched by GitHub Action `Fetch metrics` (sources: OpenAlex, Semantic Scholar, Crossref; repo stars via GitHub API). Claude can't reach these APIs.
 - 31 Oct — P01, P02 are white-box optimization attacks (need GPU) → cite as related work/taxonomy, don't reproduce.
 - 31 Oct — P03 (PromptShield, public detectors) and P04 (OpenRAG-Soc carriers + sanitize/normalize/attribution) are the strongest reuse candidates for defense and RAG app.
 
