@@ -2,7 +2,7 @@
 
 **Project:** Security Evaluation of Cloud-Hosted LLM Applications Against Prompt Injection (CEP_BRIEF.md)
 **Constraints:** Python · no GPU · open-source models only · solo · repo public (master)
-**Deadline:** 9 Nov 2026 (research paper). **Last updated:** 31 Oct 2026 (session 1)
+**Deadline:** 9 Nov 2026 (research paper). **Last updated:** 31 Oct 2026 (end of session 1; usage limit reached)
 
 ## Confirmed requirements
 - Attack evaluation (models x minimal apps x injection types) AND a proposed defense AND AWS deployment. Output = research paper.
@@ -25,9 +25,9 @@
 1–2 Nov: finish extraction + ranking · 2–3 Nov: gaps + experiment design + harness code · 3–6 Nov: runs, defense, results · 6–8 Nov: AWS deploy + paper · 9 Nov: submit. Cut scope before cutting experiments.
 
 ## Next actions (max 3)
-1. User: add `scripts/fetch_metrics.py` and `.github/workflows/metrics.yml`; commit; then GitHub > Actions > "Fetch metrics" > Run workflow. It commits data/citations.csv and data/artifacts.csv.
-2. Claude: extract P09–P13 (skills/01), read the two CSVs, then rank (skills/02).
-3. User: after P09–P13 are committed, run the workflow again (it is safe to re-run).
+1. Claude: extract P09–P13 (skills/01) in two batches (P09–P11, P12–P13); write JSON + update ledger/verified/facts.
+2. Claude: read data/citations.csv and data/artifacts.csv (already in repo; do NOT re-run the workflow unless P09–P13 DOIs are new), then rank + exclude (skills/02) -> reports/ranking.md.
+3. User: commit outputs, re-run "Fetch metrics" workflow once after P09–P13 are committed, approve shortlist.
 
 ## Decisions log
 - 31 Oct — D1 REVERSED by user: citation counts ARE required. Fetched by GitHub Action `Fetch metrics` (sources: OpenAlex, Semantic Scholar, Crossref; repo stars via GitHub API). Claude can't reach these APIs.
