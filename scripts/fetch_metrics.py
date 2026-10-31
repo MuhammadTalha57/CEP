@@ -9,19 +9,21 @@ NOW = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 UA = {"User-Agent": "cep-metrics/1.0 (student project)"}
 GH_TOKEN = os.environ.get("GH_TOKEN", "")
 
-def get(url, headers=None, tries=3):
+def get(url, headers=None, tries=4):
     h = dict(UA); h.update(headers or {})
+    err = "unknown error"
     for i in range(tries):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=25) as r:
                 return json.loads(r.read().decode("utf8", "replace")), ""
         except urllib.error.HTTPError as e:
+            err = f"HTTP {e.code}"
             if e.code == 404: return None, "404 not found"
-            if e.code in (429, 503): time.sleep(3 * (i + 1)); continue
-            return None, f"HTTP {e.code}"
+            if e.code in (429, 503): time.sleep(5 * (2 ** i)); continue   # backoff 5,10,20,40 s
+            return None, err
         except Exception as e:
             err = type(e).__name__
-            time.sleep(1)
+            time.sleep(2)
     return None, err
 
 def sim(a, b):
@@ -67,9 +69,12 @@ def citations():
     out = []
     for r in rows:
         doi, title = clean_doi(r.get("doi")), r.get("title", "")
-        oa, oa_t, oa_n = openalex(doi, title); time.sleep(0.3)
-        sc, si, s_t, s_n = s2(doi, title); time.sleep(1.0)
-        cr = crossref(doi); time.sleep(0.3)
+        try:
+            oa, oa_t, oa_n = openalex(doi, title); time.sleep(0.3)
+            sc, si, s_t, s_n = s2(doi, title); time.sleep(3.0)
+            cr = crossref(doi); time.sleep(0.3)
+        except Exception as ex:
+            oa = oa_t = sc = si = s_t = cr = ""; oa_n = ""; s_n = f"script error: {type(ex).__name__}: {ex}"
         notes = "; ".join(x for x in (oa_n, s_n) if x)
         mism = [n for n, t in (("openalex", oa_t), ("s2", s_t)) if t and title and sim(t, title) < 0.85]
         if mism: notes += f"; TITLE MISMATCH in {','.join(mism)} - verify manually"
