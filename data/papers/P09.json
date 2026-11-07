@@ -1,0 +1,253 @@
+{
+ "id": "P09",
+ "file": "Efficient_Prompt_Security_Detection_for_LLM_Service_Deployment_in_Edge-Cloud_Networks.pdf",
+ "git_blob": "441cdd69b085d413b42c10353668f62709d98728",
+ "meta": {
+  "title": "Efficient Prompt Security Detection for LLM Service Deployment in Edge-Cloud Networks (BUUAS)",
+  "authors": [
+   "Wenjing Chen",
+   "Jie Cui",
+   "Wenjie Huang",
+   "Jing Zhang",
+   "Lu Wei",
+   "Geyong Min"
+  ],
+  "year": 2026,
+  "venue": "IEEE Transactions on Dependable and Secure Computing (TDSC), vol. 23, no. 5",
+  "doi": "10.1109/TDSC.2026.3709894",
+  "pages": 15
+ },
+ "type": "defense (detection scheduling, edge-cloud)",
+ "problem": {
+  "v": "Edge-cloud prompt-injection detection ignores user/prompt heterogeneity, so detection is inefficient and leaves security gaps",
+  "p": 1,
+  "q": "largely overlook the issue of user heterogeneity"
+ },
+ "main_idea": {
+  "v": "BUUAS: Bayesian-inspired per-user belief update + belief-weighted contextual bandit (BWCB) decides which prompts get edge-side DeBERTa detection vs a cheaper path to the cloud LLM",
+  "p": 1,
+  "q": "Bayesian-inspired belief update method with a belief-weighted contextual multi-armed bandit"
+ },
+ "threat_model": {
+  "v": "Adversary controls prompt text only; no access to model parameters, detector or configuration. Attacks: hidden injection, role manipulation, jailbreak-style prompting",
+  "p": 5,
+  "q": "adversary can fully control the textual content of input prompts"
+ },
+ "injection_types_covered": [
+  {
+   "name": "hidden prompt injection / role manipulation / jailbreak-style prompting (generic, via labelled prompt datasets)",
+   "p": 5,
+   "q": "hidden prompt injection, role manipulation, or jailbreak-style prompting"
+  },
+  {
+   "name": "User behaviour patterns simulated (not injection techniques): Static-mal, Alt(1B-1M), Alt(2B-2M), Warm-up20, Warm-up30",
+   "p": 9,
+   "q": "persistent malicious attacks, denoted as Static-mal"
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "Qwen-4B (Ollama)",
+   "size": "4B",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "Qwen-7B (Ollama; also cloud validation LLM)",
+   "size": "7B",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "Qwen-14B (Ollama)",
+   "size": "14B",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "deberta-v3-base-prompt-injection-v2 (protectai) edge detector",
+   "size": "NOT FOUND",
+   "open_source": true,
+   "p": 8
+  },
+  {
+   "name": "TestSavant prompt-injection-defender-base-v0 (alt detector)",
+   "size": "NOT FOUND",
+   "open_source": true,
+   "p": 12
+  },
+  {
+   "name": "Sentinel prompt-injection-jailbreak-sentinel-v2 (alt detector)",
+   "size": "NOT FOUND",
+   "open_source": true,
+   "p": 12
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "jackhhao/jailbreak-classification (HF)",
+   "size": "NOT FOUND (Table I is an image, not read)",
+   "url": "https://huggingface.co/datasets/jackhhao/jailbreak-classification",
+   "p": 8
+  },
+  {
+   "name": "guychuk/benign-malicious-prompt-classification (HF)",
+   "size": "NOT FOUND (Table I not read)",
+   "url": "https://huggingface.co/datasets/guychuk/benign-maliciouspromptclassification",
+   "p": 8
+  },
+  {
+   "name": "ahsanayub/malicious-prompts (HF)",
+   "size": "NOT FOUND (Table I not read)",
+   "url": "https://huggingface.co/datasets/ahsanayub/malicious-prompts",
+   "p": 8
+  }
+ ],
+ "metrics": [
+  {
+   "name": "Accuracy / Precision / Recall / F1 (mean±std over five independent seeds)",
+   "definition": "NOT FOUND (standard; not defined in text)",
+   "p": 10
+  },
+  {
+   "name": "Throughput",
+   "definition": "number of tokens processed per second, benign and malicious prompts",
+   "p": 8
+  },
+  {
+   "name": "Avg latency, GPU memory, GPU utilization",
+   "definition": "NOT FOUND",
+   "p": 10
+  },
+  {
+   "name": "Edge bypass rate of malicious requests",
+   "definition": "NOT FOUND",
+   "p": 9
+  }
+ ],
+ "results": [
+  {
+   "claim": "Throughput, cloud-only -> proposed (tokens/s)",
+   "number": "Qwen-4B 86.97->108.73; Qwen-7B 69.49->88.44; Qwen-14B 50.32->53.13",
+   "setting": "Table II / Sec V-B; RTX 4090, Ollama, edge+cloud emulated on one machine",
+   "p": 9,
+   "q": "throughput improved from 86.97 token/s to 108.73 token/s for"
+  },
+  {
+   "claim": "Static-mal: GMDRA beats BUUAS on Acc/F1; BUUAS has best Recall",
+   "number": "GMDRA Acc 0.860 F1 0.865; Ours Acc 0.705 F1 0.752 Rec 0.941",
+   "setting": "Table III, balanced set, no-detection Acc 0.500",
+   "p": 10,
+   "q": "GMDRA achieves better Accuracy and F1 score"
+  },
+  {
+   "claim": "Alt(1B-1M): Ours vs GMDRA",
+   "number": "Ours Acc 0.683 Rec 0.865 F1 0.692; GMDRA Acc 0.660 Rec 0.531 F1 0.639 (GMDRA Prec 0.740 > Ours 0.643)",
+   "setting": "Table III",
+   "p": 10,
+   "q": ""
+  },
+  {
+   "claim": "Alt(2B-2M): Ours vs GMDRA",
+   "number": "Ours Acc 0.686 Rec 0.882 F1 0.722; GMDRA Acc 0.677 Rec 0.523 F1 0.616",
+   "setting": "Table III",
+   "p": 10,
+   "q": ""
+  },
+  {
+   "claim": "Warm-up20: Ours vs GMDRA",
+   "number": "Ours Acc 0.636 Prec 0.718 Rec 0.392 F1 0.498; GMDRA Acc 0.527 Prec 0.661 Rec 0.322 F1 0.394",
+   "setting": "Table III",
+   "p": 10,
+   "q": "",
+   "confidence": "medium"
+  },
+  {
+   "claim": "Warm-up30: Ours ~Acc 0.589 F1 0.477 (read at low resolution)",
+   "number": "NOT RELIABLY READ",
+   "setting": "Table III",
+   "p": 10,
+   "q": "",
+   "confidence": "low"
+  },
+  {
+   "claim": "Full detection costs the most latency and GPU memory",
+   "number": "up to 0.08 s per token; ~4.5x10^3 MiB in final slot",
+   "setting": "Fig. 4 text, five time-slots",
+   "p": 10,
+   "q": "up to 0.08 s per token and about"
+  },
+  {
+   "claim": "Belief simulation size",
+   "number": "60 rounds, 100 users, five attack patterns",
+   "setting": "Sec V-C",
+   "p": 9,
+   "q": "we simulate 60 rounds of continuous communication among 100 users"
+  }
+ ],
+ "baselines": [
+  "No detection",
+  "GMDRA [15]",
+  "Random selection",
+  "Top-k risk",
+  "Least-token selection (Fig 4 only)",
+  "Full detection (Fig 4 only)",
+  "Cloud-only architecture (throughput)"
+ ],
+ "limitations_stated": [
+  {
+   "v": "NOT FOUND (no limitations or threats-to-validity section; conclusion only)",
+   "p": 14,
+   "q": ""
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Evaluation is on labelled prompt datasets with simulated users; no real LLM-app task and no measurement of whether an injection succeeded against a model",
+  "[INFERENCE] Edge and cloud are emulated on a single RTX 4090 workstation (Sec V-A), so no real network latency is measured",
+  "[INFERENCE] 70% of each dataset is stored in the retrieval index and 30% tested (p8): near-duplicate leakage inflates detection; cross-dataset test only in Table IV",
+  "[INFERENCE] The scheduler detects only a subset of prompts: its Accuracy (0.59-0.71) and F1 (0.48-0.75) in Table III are far below full detection and below GMDRA in Static-mal",
+  "[INFERENCE] Needs a GPU workstation and a vector DB (Milvus); not reproducible under our no-GPU constraint"
+ ],
+ "artifacts": [
+  {
+   "kind": "data",
+   "url": "https://huggingface.co/datasets/jackhhao/jailbreak-classification",
+   "p": 8,
+   "checked": null
+  },
+  {
+   "kind": "data",
+   "url": "https://huggingface.co/datasets/guychuk/benign-maliciouspromptclassification",
+   "p": 8,
+   "checked": null
+  },
+  {
+   "kind": "data",
+   "url": "https://huggingface.co/datasets/ahsanayub/malicious-prompts",
+   "p": 8,
+   "checked": null
+  },
+  {
+   "kind": "other",
+   "url": "https://huggingface.co/protectai/deberta-v3-base-prompt-injection-v2",
+   "p": 8,
+   "checked": null
+  },
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Low priority as a method (GPU, simulated edge-cloud). Reuse the three public HF prompt datasets and the public detectors (protectai DeBERTa v2, TestSavant, Sentinel) as off-the-shelf detector candidates for our defense; cite as related work on adaptive detection scheduling",
+  "why": "[INFERENCE] Same detector family as P03/P06; Table IV shows detector choice changes precision/recall trade-off"
+ },
+ "confidence": "medium",
+ "flags": [
+  "Table I (dataset sizes) and Table IV numbers not read; Table III rows Static-mal..Warm-up20 read at 220 dpi, Warm-up30 only at 90 dpi (low)",
+  "Metric definitions and code release NOT FOUND",
+  "Venue string: IEEE TDSC vol 23 no 5; PDF carries NED University download stamp dated 31 Oct 2026"
+ ]
+}

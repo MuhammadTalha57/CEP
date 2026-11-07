@@ -1,0 +1,154 @@
+{
+ "id": "P11",
+ "file": "Privacy-Preserving_Prompt_Injection_Detection_for_Smart_Cloud-Deployed_Large_Language_Models.pdf",
+ "git_blob": "ed0612a9a5f0f52ccfe807b85f91342fc252569b",
+ "meta": {
+  "title": "Privacy-Preserving Prompt Injection Detection for Smart Cloud-Deployed Large Language Models",
+  "authors": [
+   "Guozhi Hao",
+   "Jun Wu"
+  ],
+  "year": 2025,
+  "venue": "IEEE SmartCloud 2025 (10th Int. Conf. on Smart Cloud)",
+  "doi": "10.1109/SmartCloud66068.2025.00009",
+  "pages": 6
+ },
+ "type": "defense (detection / audit)",
+ "problem": {
+  "v": "Providers want to re-audit past prompts for new injection templates but storing raw prompts violates privacy",
+  "p": 1,
+  "q": "conflicts directly with user privacy mandates"
+ },
+ "main_idea": {
+  "v": "Chunk prompts, keep only salted SHA-256 hashes (exact match) and sentence embeddings (cosine near-match) of templates and attack questions; classify NONE/TEMPLATE/QUESTION/BOTH; optional blockchain log",
+  "p": 1,
+  "q": "stores only non-invertible representations of them"
+ },
+ "threat_model": {
+  "v": "Stored hashes/embeddings assumed unreadable by attackers; attacker crafts template+harmful question prompts",
+  "p": 3,
+  "q": "adversaries cannot directly read the stored embeddings or hashes"
+ },
+ "injection_types_covered": [
+  {
+   "name": "Ignore previous instructions",
+   "p": 5,
+   "q": "Ignore previous instructions"
+  },
+  {
+   "name": "Information overload",
+   "p": 5,
+   "q": "Information overload"
+  },
+  {
+   "name": "Repeated-token attack",
+   "p": 5,
+   "q": "Repeated-token attack"
+  },
+  {
+   "name": "System mode",
+   "p": 5,
+   "q": "System mode"
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "all-MiniLM-L6-v2 (sentence-transformers) embedder",
+   "size": "NOT FOUND",
+   "open_source": true,
+   "p": 5
+  },
+  {
+   "name": "GPT-3.5-turbo / GPT-4o-mini (listed under 'Test Models'; unclear if queried)",
+   "size": "NOT FOUND",
+   "open_source": false,
+   "p": 5
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "2000 generated test prompts: 4 injection templates x 50 prohibited-scenario questions [14],[15] + random normal questions",
+   "size": "2000",
+   "url": "NOT FOUND",
+   "p": 5
+  }
+ ],
+ "metrics": [
+  {
+   "name": "Precision, Recall, F1 per class (NONE, TEMPLATE, QUESTION, BOTH)",
+   "definition": "standard; varied over theta (0.62-0.70) and window W (2-10)",
+   "p": 5
+  }
+ ],
+ "results": [
+  {
+   "claim": "F1 above 0.94 for TEMPLATE and NONE (theta sweep)",
+   "number": ">0.94",
+   "setting": "W=10, theta 0.62-0.70; read from Fig. 2 and text only",
+   "p": 6,
+   "q": "remain above 0.94 across TEMPLATE and NONE classes"
+  },
+  {
+   "claim": "F1 up to 0.96 or higher for BOTH and NONE",
+   "number": "up to 0.96+",
+   "setting": "theta=0.66, W=8 or 10",
+   "p": 6,
+   "q": "F1 of up to 0.96 or higher for BOTH and NONE"
+  },
+  {
+   "claim": "Authors' own variants are worse: full-text embedding lags; hash-only has very low recall on paraphrases",
+   "number": "not tabulated (Fig. 2 only)",
+   "setting": "vs Full-Text Embedding Detection and Window-based Hash Detection",
+   "p": 6,
+   "q": "The hash-only detection is too rigid for paraphrased"
+  },
+  {
+   "claim": "Blockchain logging cost (Sepolia testnet)",
+   "number": "sign&publish 1.375 s; confirmation 8.670 s; gas 22280",
+   "setting": "Table I",
+   "p": 4,
+   "q": "",
+   "confidence": "medium"
+  }
+ ],
+ "baselines": [
+  "Full-Text Embedding Detection (authors' variant)",
+  "Window-based Hash Detection (authors' variant)"
+ ],
+ "limitations_stated": [
+  {
+   "v": "Privacy scheme not analysed in detail",
+   "p": 3,
+   "q": "without discussing detailed aspects of privacy scheme extensively"
+  },
+  {
+   "v": "Embedding inversion / membership inference possible in principle",
+   "p": 4,
+   "q": "embedding inversion or membership inference) are possible in principle"
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Detects presence of known template/question strings, not whether an LLM was actually hijacked; no ASR measured",
+  "[INFERENCE] Test prompts built by combining the same template/question pools stored in the index; no held-out split described, so recall is likely inflated",
+  "[INFERENCE] No external baseline detectors (e.g. PromptGuard) and no FPR on realistic benign traffic; results only in figures with no numeric table",
+  "[INFERENCE] Privacy guarantees asserted ('strong privacy guarantees', p3) but not evaluated; DP noise mentioned but not applied in experiments"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Low. CPU-only hash + MiniLM near-match is cheap and could serve as a baseline 'known-template filter' in our defense comparison; do not cite its F1 as evidence of real-world detection",
+  "why": "[INFERENCE] Method trivially reproducible but the evaluation does not support strong claims"
+ },
+ "confidence": "medium",
+ "flags": [
+  "All results in Fig. 2 (plots); only text-stated numbers recorded",
+  "'Test Models' GPT-3.5/GPT-4o-mini listed but no model-side results reported",
+  "Blockchain Table I read from extraction, not image"
+ ]
+}

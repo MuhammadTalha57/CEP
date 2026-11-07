@@ -30,3 +30,15 @@
 | P08 (IEEE SaTML 2026) | Solves 77% of AgentDojo tasks with security guarantees vs 84% undefended | 77% vs 84% | 1 |
 | P08 (IEEE SaTML 2026) | Token overhead for median task | 2.82x input, 2.73x output | 11 |
 | P08 (IEEE SaTML 2026) | Utility drop examples (native -> CaMeL): Claude 4 Sonnet 83.5% -> 70.1%; Gemini 2.5 Flash 55.7% -> 35.1% | -13.4 / -20.6 pts | 16 |
+| P09 (IEEE TDSC 2026) | Throughput cloud-only -> BUUAS (tokens/s): Qwen-4B 86.97->108.73; Qwen-7B 69.49->88.44; Qwen-14B 50.32->53.13 | see claim | 9 |
+| P09 (IEEE TDSC 2026) | Static-mal, balanced set: GMDRA Acc 0.860 / F1 0.865 vs BUUAS Acc 0.705 / F1 0.752 / Recall 0.941; no-detection Acc 0.500 | see claim | 10 |
+| P09 (IEEE TDSC 2026) | Alt(2B-2M): BUUAS Acc 0.686, Recall 0.882, F1 0.722 vs GMDRA 0.677 / 0.523 / 0.616 | see claim | 10 |
+| P10 (IEEE ICTIIA 2026) | NPC jailbreak rate, 80 prompts: GPT-4o-mini 28.75% -> 26.25% (McNemar p=0.75); Llama-3.1-8B 26.25% -> 18.75% (p=0.26); 0/20 false positives | not significant | 4-5 |
+| P10 (IEEE ICTIIA 2026) | Ablation (10 seeds): enforcement blocks 17.6 -> 3.1 (82%); profile fit 3.80 -> 4.10; PCS 0.675 -> 0.735 | 82% | 5 |
+| P10 (IEEE ICTIIA 2026) | Mean latency delta: GPT-4o-mini +61.1 ms; Llama-3.1-8B -19.2 ms | +61.1 / -19.2 ms | 4 |
+| P11 (IEEE SmartCloud 2025) | Hash+embedding chunk detector: F1 > 0.94 on TEMPLATE and NONE (W=10, theta 0.62-0.70); up to 0.96+ on BOTH/NONE (theta 0.66, W 8-10); 2000 generated prompts; no external baseline | F1 0.94-0.96 (figure-read) | 5-6 |
+| P11 (IEEE SmartCloud 2025) | Blockchain log on Sepolia: sign&publish 1.375 s, confirmation 8.670 s, gas 22280 | see claim | 4 |
+| P12 (IEEE ICAIC 2026) [self-reported; internally inconsistent, cite as claim only] | Full SPEP ASR: AWS 8%, GCP 6%, Azure 7% (baseline 78% stated only in conclusion); +42 ms per inference | 78% -> <8% | 5 |
+| P13 (IEEE ICHORA 2026) | Mean ASR over 6 local models x 3 PDF vectors; 400 PDFs, 2,400 trials | 47.78% | 1, 5 |
+| P13 (IEEE ICHORA 2026) | ASR by model (white/tiny/metadata mean): Gemma-3 96.33, Llama-3 61.00, Phi-4 56.00, MedLlama-2 35.33, Qwen-3 29.33, Meditron 8.67 | 8.67-96.33% | 5 |
+| P13 (IEEE ICHORA 2026) | ASR by vector (mean of 6 models): white-text 50.83, tiny-font 49.33, metadata 43.17; 0.00% tracer hits on benign documents | 43.17-50.83% | 5 |

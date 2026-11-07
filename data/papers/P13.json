@@ -1,0 +1,194 @@
+{
+ "id": "P13",
+ "file": "Visual_and_Structural_Prompt_Injection_in_Medical_Rag_Systems_a_Comparative_Robustness_Analysis.pdf",
+ "git_blob": "1533e4a97dcbc5bfd9abe5dbc55766fdd71b62a4",
+ "meta": {
+  "title": "Visual and Structural Prompt Injection in Medical RAG Systems: A Comparative Robustness Analysis",
+  "authors": [
+   "Songul Erdem Guler",
+   "Muhammed Ali Aydin"
+  ],
+  "year": 2026,
+  "venue": "IEEE ICHORA 2026 (8th Int. Congress on HCI, Optimization and Robotic Applications)",
+  "doi": "10.1109/ICHORA69329.2026.11536987",
+  "pages": 7
+ },
+ "type": "attack (indirect injection evaluation)",
+ "problem": {
+  "v": "Local open-source medical RAG pipelines parse PDFs ignoring visual attributes, so hidden text can steer the model",
+  "p": 1,
+  "q": "parsing gaps in the document processing layer"
+ },
+ "main_idea": {
+  "v": "Inject one fixed payload into PDFs via white text, 0.1 pt text and metadata fields; measure ASR on six local models with tracer keywords (septic shock, meropenem)",
+  "p": 1,
+  "q": "visual-semantic mismatch (white-text), micro-typography, and metadata manipulation techniques"
+ },
+ "threat_model": {
+  "v": "Black-box attacker who can upload PDFs that a pypdf-style RAG pipeline indexes",
+  "p": 3,
+  "q": "black-box threat model is adopted where the attacker does not have access"
+ },
+ "injection_types_covered": [
+  {
+   "name": "White-text (visual-semantic dissonance)",
+   "p": 3,
+   "q": "RGB: 255, 255, 255 - White"
+  },
+  {
+   "name": "Micro-typography (0.1 pt font in footer/margin)",
+   "p": 3,
+   "q": "reduced to 0.1 point size"
+  },
+  {
+   "name": "Structural metadata (/Subject, /Author)",
+   "p": 3,
+   "q": "Document Properties"
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "Llama-3",
+   "size": "8B",
+   "open_source": true,
+   "p": 4
+  },
+  {
+   "name": "Gemma-3",
+   "size": "NOT FOUND (Table II says 'Latest')",
+   "open_source": true,
+   "p": 4
+  },
+  {
+   "name": "Qwen-3",
+   "size": "8B",
+   "open_source": true,
+   "p": 4
+  },
+  {
+   "name": "Meditron",
+   "size": "7B",
+   "open_source": true,
+   "p": 4
+  },
+  {
+   "name": "MedLlama-2",
+   "size": "7B (Table II only)",
+   "open_source": true,
+   "p": 5
+  },
+  {
+   "name": "Phi-4",
+   "size": "14B",
+   "open_source": true,
+   "p": 4
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "100 synthetic discharge summaries (Gemini 2.5 Flash, 10 disease categories) -> 400 PDFs (100 benign + 300 infected)",
+   "size": "400 documents",
+   "url": "NOT FOUND",
+   "p": 4
+  }
+ ],
+ "metrics": [
+  {
+   "name": "ASR",
+   "definition": "percent of outputs containing tracer keywords 'septic shock' or 'meropenem'",
+   "p": 5
+  },
+  {
+   "name": "False-positive rate on benign documents",
+   "definition": "tracer keywords in clean-document outputs",
+   "p": 5
+  }
+ ],
+ "results": [
+  {
+   "claim": "Average ASR over 6 models x 3 vectors",
+   "number": "47.78%",
+   "setting": "2,400 inference trials; Table II",
+   "p": 1,
+   "q": "manipulated with an average Attack Success Rate (ASR) of 47.78%"
+  },
+  {
+   "claim": "Per-model mean ASR",
+   "number": "Gemma-3 96.33; Llama-3 61.00; Phi-4 56.00; MedLlama-2 35.33; Qwen-3 29.33; Meditron 8.67",
+   "setting": "Table II (arithmetic of cells verified)",
+   "p": 5,
+   "q": ""
+  },
+  {
+   "claim": "Per-vector mean ASR",
+   "number": "white-text 50.83; tiny-font 49.33; metadata 43.17",
+   "setting": "Table II (verified)",
+   "p": 5,
+   "q": ""
+  },
+  {
+   "claim": "Gemma-3 per vector",
+   "number": "96 / 95 / 98 (white / tiny / metadata)",
+   "setting": "Table II (p5); quote on p1",
+   "p": 1,
+   "q": "Gemma-3 model exhibited the highest vulnerability with 96.33% ASR"
+  },
+  {
+   "claim": "Meditron-7B most resistant",
+   "number": "4 / 6 / 16 -> 8.67%",
+   "setting": "Table II",
+   "p": 1,
+   "q": "Meditron-7B model, trained specifically for the medical domain, demonstrated superior resistance with 8.67% ASR"
+  },
+  {
+   "claim": "No tracer keywords on clean documents",
+   "number": "0.00% FPR, all models",
+   "setting": "benign control",
+   "p": 5,
+   "q": "false positive rate for benign documents in all models was recorded as 0.00%"
+  },
+  {
+   "claim": "Larger is not safer: Phi-4 14B vs Meditron 7B",
+   "number": "56% vs 8.67%",
+   "setting": "Table II",
+   "p": 6,
+   "q": "assumption that larger models are safer is not valid for this type of attack"
+  }
+ ],
+ "baselines": [
+  "Benign (uninjected) control documents"
+ ],
+ "limitations_stated": [
+  {
+   "v": "NOT FOUND (no limitations section; future work lists visual sanitization and VLMs)",
+   "p": 6,
+   "q": ""
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] 2,400 = 6 models x 400 docs, so each ASR cell is one trial over 100 documents: no repeats, no CIs, no stated temperature or seed",
+  "[INFERENCE] Success = keyword present; a refusal or negation mentioning 'septic shock' would count as success (possible over-counting) and a paraphrased compliance would be missed",
+  "[INFERENCE] 'RAG' pipeline (retriever, chunking, vector DB) NOT FOUND; only pypdf-style text extraction is described, so retrieval may not be in the loop",
+  "[INFERENCE] Low ASR of Meditron may reflect weaker instruction following, not 'robustness'; no utility measured on clean documents",
+  "[INFERENCE] Single fixed payload and single task; Gemma-3 size/quantization, system prompt and runtime NOT FOUND",
+  "[INFERENCE] Domain-tuned vs general model comparison is confounded by family, size and fine-tuning recipe"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "High for our RAG app: PDF injection vectors (white text, 0.1 pt, metadata) are cheap and CPU-only; six open models of 7-14B are in our reach; tracer-keyword success check is deterministic. We add: multiple runs with CIs, stricter success rule, clean-task utility, and a sanitization defense (strip hidden text, flag tiny/white fonts, drop metadata) as in P04's sanitize/normalize",
+  "why": "[INFERENCE]"
+ },
+ "confidence": "medium",
+ "flags": [
+  "Table II header 'Ortalama' = Turkish for 'Average'",
+  "Contribution bullets duplicated in intro (p2)",
+  "Not comparable with P05 numbers (different benchmark, model and metric definition)"
+ ]
+}

@@ -108,6 +108,81 @@
         "code release",
         "table layouts (flagged)"
       ]
+    },
+    "441cdd69b085d413b42c10353668f62709d98728": {
+      "id": "P09",
+      "date": "2026-11-07",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs",
+        "all q quotes machine-matched to PDF page text"
+      ],
+      "unchecked": [
+        "Table I dataset sizes",
+        "Table IV numbers",
+        "Table III Warm-up30 row (low-res)",
+        "code release",
+        "metric definitions"
+      ]
+    },
+    "417042c433b1cf1c2b34d6bdf97b01822e03b148": {
+      "id": "P10",
+      "date": "2026-11-07",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs",
+        "all q quotes machine-matched to PDF page text"
+      ],
+      "unchecked": [
+        "code release",
+        "Table I column order (reconstructed, cross-checked via aggregates)"
+      ]
+    },
+    "ed0612a9a5f0f52ccfe807b85f91342fc252569b": {
+      "id": "P11",
+      "date": "2026-11-07",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs",
+        "all q quotes machine-matched to PDF page text"
+      ],
+      "unchecked": [
+        "numbers inside Fig. 2 plots",
+        "code release",
+        "Table I (blockchain) image"
+      ]
+    },
+    "822b04c38f128eb769382f66692a9aa504c86a05": {
+      "id": "P12",
+      "date": "2026-11-07",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs",
+        "all q quotes machine-matched to PDF page text"
+      ],
+      "unchecked": [
+        "Table II coverage matrix (garbled)",
+        "code release",
+        "internal inconsistencies unresolved"
+      ]
+    },
+    "1533e4a97dcbc5bfd9abe5dbc55766fdd71b62a4": {
+      "id": "P13",
+      "date": "2026-11-07",
+      "checked": [
+        "meta",
+        "key results numbers+pages",
+        "artifact URLs",
+        "all q quotes machine-matched to PDF page text"
+      ],
+      "unchecked": [
+        "code release",
+        "Gemma-3 size, RAG pipeline details (NOT FOUND)"
+      ]
     }
   }
 }

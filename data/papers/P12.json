@@ -1,0 +1,164 @@
+{
+ "id": "P12",
+ "file": "Secure_Prompt_Engineering_Patterns_for_Cloud_LLM_Agents.pdf",
+ "git_blob": "822b04c38f128eb769382f66692a9aa504c86a05",
+ "meta": {
+  "title": "Secure Prompt Engineering Patterns for Cloud LLM Agents (SPEP)",
+  "authors": [
+   "Shalini Sudarsan",
+   "Advait Patel",
+   "Charit Upadhyay",
+   "Vaishnavi Gudur",
+   "Prashanthi Matam"
+  ],
+  "year": 2026,
+  "venue": "IEEE ICAIC 2026 (5th Int. Conf. on AI in Cybersecurity), Houston",
+  "doi": "10.1109/ICAIC67076.2026.11395764",
+  "pages": 6
+ },
+ "type": "defense (pattern catalog) + threat taxonomy",
+ "problem": {
+  "v": "Prompt injection against LLM agents wired into cloud APIs can cause unauthorized actions, data exposure and cost abuse",
+  "p": 1,
+  "q": "bait agents to perform unauthorized actions"
+ },
+ "main_idea": {
+  "v": "SPEP: taxonomy of direct/indirect/multi-stage cloud-agent threats and reusable patterns (sanitization, instruction-data separation, multi-agent consensus, output confinement, execution confirmation)",
+  "p": 1,
+  "q": "suggest reusable security patterns aimed at input sanitization"
+ },
+ "threat_model": {
+  "v": "Direct injection (command override, privilege escalation, resource abuse), indirect (poisoned logs, wikis, API/email content), multi-stage chains",
+  "p": 2,
+  "q": "Prompt injection threats targeting LLM agents integrated with cloud APIs"
+ },
+ "injection_types_covered": [
+  {
+   "name": "Command override",
+   "p": 2,
+   "q": "command override attempts"
+  },
+  {
+   "name": "Privilege escalation prompts (create access keys, modify IAM roles)",
+   "p": 2,
+   "q": "privilege escalation prompts"
+  },
+  {
+   "name": "Resource abuse (excess provisioning)",
+   "p": 2,
+   "q": "resource abuse prompts"
+  },
+  {
+   "name": "Indirect: log poisoning, knowledge-base/wiki injection, cross-domain payloads",
+   "p": 2,
+   "q": "poisoning cloud audit logs with malicious entries"
+  },
+  {
+   "name": "Multi-stage (indirect plant then direct escalation)",
+   "p": 3,
+   "q": "multi-stage exploit chains"
+  }
+ ],
+ "models_tested": [
+  {
+   "name": "OpenAI GPT-4",
+   "size": "NOT FOUND",
+   "open_source": false,
+   "p": 5
+  },
+  {
+   "name": "Anthropic Claude",
+   "size": "NOT FOUND",
+   "open_source": false,
+   "p": 5
+  },
+  {
+   "name": "Google Gemini",
+   "size": "NOT FOUND",
+   "open_source": false,
+   "p": 5
+  }
+ ],
+ "datasets_benchmarks": [
+  {
+   "name": "'200+ prompt injection corpus' (direct, indirect, cross-agent), not released",
+   "size": "200+",
+   "url": "NOT FOUND",
+   "p": 4
+  }
+ ],
+ "metrics": [
+  {
+   "name": "ASR, latency overhead, false positives, Trust Deviation Metric (TDM)",
+   "definition": "TDM = expected vs actual agent actions; ASR success criterion NOT FOUND",
+   "p": 4
+  }
+ ],
+ "results": [
+  {
+   "claim": "ASR with full SPEP: AWS 8%, GCP 6%, Azure 7%",
+   "number": "8% / 6% / 7%",
+   "setting": "AWS, GCP, Azure testbeds; models GPT-4/Claude/Gemini; per-model split NOT FOUND",
+   "p": 5,
+   "q": "AWS at 8%, GCP at 6% and Azure at 7%"
+  },
+  {
+   "claim": "Baseline ASR 78% -> under 8%; ~92% reduction (claimed)",
+   "number": "78% -> <8%",
+   "setting": "Conclusion; baseline 78% appears only here",
+   "p": 5,
+   "q": "reduce attack success rates from 78% to under 8%",
+   "confidence": "low"
+  },
+  {
+   "claim": "Component effects: Input sanitization blocked 65% of direct injections; role/context separation reduced indirect by 71%; execution confirmation prevented 98% of destructive operations",
+   "number": "65% / 71% / 98%",
+   "setting": "Sec VII",
+   "p": 5,
+   "q": "Input Sanitization blocked 65% of direct injection attempts",
+   "confidence": "low"
+  },
+  {
+   "claim": "Overhead",
+   "number": "+42 ms per inference; 7.8% latency over 500 queries; <5% resource",
+   "setting": "Sec VII",
+   "p": 5,
+   "q": "averaging +42 ms per inference across platforms"
+  }
+ ],
+ "baselines": [
+  "Baseline agents with no defenses; patterns added incrementally"
+ ],
+ "limitations_stated": [
+  {
+   "v": "NOT FOUND (only 'future work')",
+   "p": 5,
+   "q": ""
+  }
+ ],
+ "limitations_inferred": [
+  "[INFERENCE] Internally inconsistent: Sec III names four patterns, Sec V says five different ones (ISF, RCS, ECF, CAR, CTI)",
+  "[INFERENCE] 'Under 8%' contradicts AWS = 8%; (78-8)/78 = 89.7%, not 92% (92% matches only the GCP 6%)",
+  "[INFERENCE] Unrelated content: Fig. 1 knowledge-poisoning RAG, Fig. 10 spam-classifier backdoor, and a trigger-optimization equation with LaTeX debris have no link to the SPEP evaluation",
+  "[INFERENCE] No per-model results, no corpus, no code, no CIs; closed models only; claims cannot be traced to reproducible logs",
+  "[INFERENCE] Table II coverage matrix header garbled; not extracted"
+ ],
+ "artifacts": [
+  {
+   "kind": "code",
+   "url": "NOT FOUND",
+   "p": 0,
+   "checked": null
+  }
+ ],
+ "reusable_for_our_project": {
+  "v": "Only as a framing source: threat taxonomy for cloud-integrated agents and the idea of instruction/data separation, allow-list output confinement and execution confirmation for our tool app. Do not cite its percentages as evidence",
+  "why": "[INFERENCE] Numbers are not verifiable and internally inconsistent"
+ },
+ "confidence": "low",
+ "flags": [
+  "Low confidence: inconsistencies listed in limitations_inferred",
+  "Baseline ASR 78% is stated only in the conclusion",
+  "Cloud testbeds are real (AWS/GCP/Azure) but with closed LLMs, so not reproducible under our constraints"
+ ]
+}
