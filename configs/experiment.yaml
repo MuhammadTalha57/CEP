@@ -1,0 +1,22 @@
+# Experiment matrix (design.md §4.4). Cell = "<technique>@<carrier>"; "U" = clean utility tasks.
+# Edit here, not in code. Changes to cells need user approval (skills/00-rules.md rule 15).
+name: main
+variants: 30          # payload variants per attack cell (design.md §4.4)
+temperature: 0.0      # design.md §2 sampling policy
+max_tokens: 300
+# H1 = strongest technique from the pilot inside the stealthiest carriers (C2, C5).
+# null = skip H1 until the pilot picks it; if the pilot's best is T7, H1 duplicates T7@C2/T7@C5 and stays skipped.
+h1_technique: null
+
+apps:
+  chatbot:
+    cells: [T1@C0, T2@C0, T3@C0, T4@C0, T5@C0, T6@C0, T7@C0, H2@C0]
+    clean: true
+  rag:
+    cells: [T7@C1, T7@C2, T7@C3, T7@C4, T7@C5, T7@C6, T7@C7,
+            T1@C1, T2@C1, T3@C1, T4@C1, T5@C1, T6@C1,
+            H1@C2, H1@C5, H3@C2+C4]
+    clean: true
+  agent:
+    cells: [T1@C8, T2@C8, T3@C8, T4@C8, T5@C8, T6@C8, T7@C8, T7@C9, H2@C8]
+    clean: true

@@ -43,6 +43,9 @@ def build_poisoned_doc(carrier: str, doc_id: str, title: str, cover: list[str], 
     if carrier == "C4":
         raw = render_html(title, cover, f"<p>{html_lib.escape(zero_width(payload))}</p>")
         return make_document(doc_id, title, "html", raw, True)
+    if carrier == "C2+C4":  # H3 double evasion [OURS]: zero-width-split payload inside a hidden element
+        frag = hidden_html(html_lib.escape(zero_width(payload)), variant)
+        return make_document(doc_id, title, "html", render_html(title, cover, frag), True)
     if carrier == "C5":
         return make_document(doc_id, title, "pdf", render_pdf(title, cover, white_text=payload), True)
     if carrier == "C6":
