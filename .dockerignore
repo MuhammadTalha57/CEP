@@ -1,0 +1,9 @@
+.venv
+.git
+.claude
+my_papers
+results
+reports
+paper
+**/__pycache__
+.env

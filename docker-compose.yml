@@ -1,0 +1,29 @@
+# Lab stack: Ollama (model server) + app server. Same file locally and on AWS (design.md §7).
+#   docker compose up -d --build
+#   docker compose exec ollama ollama pull qwen3:1.7b
+# GPU host (EC2 g4dn/g5 with NVIDIA driver + container toolkit):
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.gpu.yml up -d --build
+services:
+  ollama:
+    image: ollama/ollama   # record `docker compose exec ollama ollama --version` in STATE.md for each run
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h      # keep the model loaded between trials
+      - OLLAMA_NUM_PARALLEL=1      # one request at a time: identical conditions locally and in the cloud
+    restart: unless-stopped
+
+  app:
+    build: .
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_URL=http://ollama:11434/v1
+      - APP_API_KEY=${APP_API_KEY:?set APP_API_KEY in .env}
+      - SERVER_ENV=${SERVER_ENV:-docker}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  ollama:
