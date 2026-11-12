@@ -1,4 +1,4 @@
-# Experiment and system design (Stage 4 plan) — STATUS: PROPOSED, awaiting user approval
+# Experiment and system design (Stage 4 plan) — STATUS: APPROVED by user 13 Nov 2026
 
 Scope locked 12 Nov 2026: **G1** (attacks: models x apps x injection types) + **G2** (defenses with utility and latency cost) + **G3** (the apps under test are cloud-hosted on AWS; local runs are for development and for the local-vs-cloud comparison).
 Paper references use `Pxx pN` = paper id and PDF page, taken from data/papers/*.json. `[OURS]` = our own design choice; `[INFERENCE]` = reasoning, not evidence.
