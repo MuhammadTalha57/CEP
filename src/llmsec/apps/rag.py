@@ -52,12 +52,14 @@ class RAGApp:
     app_id = "rag"
 
     def __init__(self, client: LLMClient, defense: Defense | None = None, kb: tuple[Document, ...] | None = None,
-                 top_k: int = 3, max_tokens: int = 300):
+                 top_k: int = 3, max_tokens: int = 300, base_chunks: list[Chunk] | None = None):
         self.client = client
         self.defense = defense or NoDefense()
         self.top_k = top_k
         self.max_tokens = max_tokens
-        self.base_chunks = [c for d in (kb if kb is not None else load_kb()) for c in self._ingest(d)]
+        # base_chunks lets the server reuse the ingested KB across requests (same defense)
+        self.base_chunks = base_chunks if base_chunks is not None else \
+            [c for d in (kb if kb is not None else load_kb()) for c in self._ingest(d)]
 
     def _ingest(self, doc: Document) -> list[Chunk]:
         cleaned = self.defense.sanitize_document(doc.raw, doc.format, doc.text)
