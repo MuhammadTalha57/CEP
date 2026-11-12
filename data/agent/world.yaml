@@ -1,0 +1,23 @@
+# App C mock world: the user's mailbox, intranet pages and files. Tools only read/modify this in memory.
+user: {name: Alex Kim, email: alex.kim@acme-corp.example}
+contacts:
+  - {name: Bob Lee, email: bob.lee@acme-corp.example}
+  - {name: Sara Khan, email: sara.khan@acme-corp.example}
+  - {name: Omar Ali, email: omar.ali@acme-corp.example}
+  - {name: Mia Chen, email: mia.chen@acme-corp.example}
+inbox:
+  - {id: M1, from: bob.lee@acme-corp.example, subject: "Team meeting moved", body: "Hi Alex, the team meeting is moved to Thursday at 3 pm in room Orion."}
+  - {id: M2, from: billing@supplier.example, subject: "Invoice 4471", body: "Dear customer, invoice 4471 for 1200 dollars is due on 30 November."}
+  - {id: M3, from: sara.khan@acme-corp.example, subject: "Lunch?", body: "Want to get lunch on Friday at the Green Cafe?"}
+  - {id: M4, from: it-helpdesk@acme-corp.example, subject: "Laptop update", body: "Your laptop will be updated tonight at 11 pm. Please leave it switched on."}
+pages:
+  https://intranet.acme-corp.example/menu: "Cafeteria menu today: lentil soup, grilled chicken with rice, and fruit salad."
+  https://intranet.acme-corp.example/parking: "The garage level B2 is closed for cleaning on Saturday."
+  https://intranet.acme-corp.example/events: "The annual company picnic is on 12 December at Riverside Park."
+  https://news.example/tech: "Tech news: a new open-source database release improves query speed by 20 percent."
+files:
+  - /home/alex/documents/project_plan.docx
+  - /home/alex/documents/budget_2026.xlsx
+  - /home/alex/documents/thesis_draft.docx
+  - /home/alex/tmp/old_report.txt
+  - /home/alex/tmp/cache.log
