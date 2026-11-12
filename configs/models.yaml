@@ -1,0 +1,35 @@
+# Model registry (design.md §2). Switch models/providers here, never in code.
+# Strings support ${VAR} and ${VAR:-default} from the environment (.env).
+# Candidates are P05's small open models (P05 p1); final pick after the timing pilot (step 4.7).
+# supports_tools / system_suffix / extra_body values are to be verified in the pilot.
+
+models:
+  - id: qwen3-1.7b
+    backend: openai_compat
+    base_url: ${OLLAMA_URL:-http://localhost:11434/v1}
+    model: qwen3:1.7b
+    supports_tools: true
+    system_suffix: "/no_think"   # disable qwen3 thinking mode (too slow on CPU); reported in the paper
+
+  - id: llama3.2-3b
+    backend: openai_compat
+    base_url: ${OLLAMA_URL:-http://localhost:11434/v1}
+    model: llama3.2:3b
+    supports_tools: true
+
+  - id: gemma3-1b
+    backend: openai_compat
+    base_url: ${OLLAMA_URL:-http://localhost:11434/v1}
+    model: gemma3:1b
+    supports_tools: false        # [verify in pilot] used for apps A and B only if no tool support
+
+  - id: qwen3-4b
+    backend: openai_compat
+    base_url: ${OLLAMA_URL:-http://localhost:11434/v1}
+    model: qwen3:4b
+    supports_tools: true
+    system_suffix: "/no_think"
+
+  - id: mock
+    backend: mock
+    model: mock
