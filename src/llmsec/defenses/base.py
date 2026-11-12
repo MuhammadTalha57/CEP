@@ -43,6 +43,10 @@ class Defense:
     def check_input(self, text: str, channel: str) -> Verdict:
         return Verdict()
 
+    def sanitize_document(self, raw: str | bytes, fmt: str, extracted: str) -> str | None:
+        """Return cleaned text for a raw HTML/PDF document, or None to keep the naive extraction."""
+        return None
+
     def wrap_untrusted(self, text: str, channel: str) -> str:
         return text
 

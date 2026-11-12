@@ -1,0 +1,123 @@
+# App B knowledge base: 20 short internal policy documents of the fictional company Acme Corp.
+# Rendered to HTML (even index) or PDF (odd index) at load time, then ingested by the naive loader.
+docs:
+  - id: KB01
+    title: Annual Leave Policy
+    paras:
+      - Full-time employees receive 24 days of paid annual leave per calendar year.
+      - Leave requests must be submitted in the HR portal at least 10 working days in advance.
+      - Up to 5 unused leave days can be carried over to the next year.
+  - id: KB02
+    title: Remote Work Policy
+    paras:
+      - Employees may work remotely up to 3 days per week with manager approval.
+      - Remote workers must be reachable on the team chat between 10 am and 4 pm.
+      - The company provides a one-time home office allowance of 300 dollars.
+  - id: KB03
+    title: Expense Reimbursement
+    paras:
+      - Business expenses must be submitted within 45 days with an itemized receipt.
+      - Expenses above 500 dollars need pre-approval from the department head.
+      - Approved expenses are reimbursed with the next monthly salary payment.
+  - id: KB04
+    title: Business Travel Policy
+    paras:
+      - Economy class is required for flights shorter than 6 hours.
+      - The daily meal allowance during business travel is 60 dollars.
+      - Hotel bookings must be made through the corporate travel portal.
+  - id: KB05
+    title: Password Policy
+    paras:
+      - Passwords must have at least 14 characters and must be changed every 180 days.
+      - Multi-factor authentication is mandatory for email and the VPN.
+      - Never share your password with anyone, including the IT helpdesk.
+  - id: KB06
+    title: VPN Access
+    paras:
+      - The corporate VPN client is called SecureLink and is installed on all company laptops.
+      - VPN sessions disconnect automatically after 12 hours.
+      - VPN problems are reported to the IT helpdesk at extension 4400.
+  - id: KB07
+    title: Company Laptops
+    paras:
+      - New employees receive a laptop on their first day from the IT office on floor 2.
+      - Laptops are replaced every 4 years.
+      - Personal software may only be installed from the approved software catalog.
+  - id: KB08
+    title: Security Incident Reporting
+    paras:
+      - Suspected phishing emails must be reported with the Report Phishing button in the mail client.
+      - Lost or stolen devices must be reported to security within 1 hour.
+      - The security team can be reached at security@acme-corp.example.
+  - id: KB09
+    title: Onboarding Program
+    paras:
+      - The onboarding program lasts 2 weeks and includes a security awareness course.
+      - Every new hire is assigned a buddy from their team.
+      - The probation period is 3 months.
+  - id: KB10
+    title: Payroll Schedule
+    paras:
+      - Salaries are paid on the 25th of every month.
+      - If the 25th falls on a weekend, salaries are paid on the previous Friday.
+      - Payslips are available in the HR portal under the Documents section.
+  - id: KB11
+    title: Health Insurance
+    paras:
+      - All employees are covered by the MediCare Plus group health plan from their first day.
+      - Spouses and children can be added to the plan at no extra cost.
+      - Dental care is covered up to 1000 dollars per year.
+  - id: KB12
+    title: Training Budget
+    paras:
+      - Each employee has an annual training budget of 1500 dollars.
+      - Training requests are approved by the direct manager.
+      - Certification exam fees are covered from the training budget.
+  - id: KB13
+    title: Office Hours and Access
+    paras:
+      - The office building is open from 7 am to 10 pm on working days.
+      - Employee badges are required to enter all floors.
+      - Weekend access requires a request to facilities 2 days in advance.
+  - id: KB14
+    title: Parking
+    paras:
+      - The company garage has 120 parking spaces for employees.
+      - Parking permits cost 40 dollars per month and are deducted from salary.
+      - Electric vehicle chargers are located on level B1.
+  - id: KB15
+    title: Visitor Policy
+    paras:
+      - Visitors must be registered at reception by their host one day in advance.
+      - Visitors must wear a visitor badge and be accompanied at all times.
+      - Visitors are not allowed in the server room.
+  - id: KB16
+    title: Data Retention
+    paras:
+      - Customer records are kept for 7 years after the end of the contract.
+      - Email is archived for 5 years.
+      - Personal data must be deleted within 30 days of a valid deletion request.
+  - id: KB17
+    title: Code of Conduct
+    paras:
+      - Gifts from suppliers worth more than 50 dollars must be declared to compliance.
+      - Conflicts of interest must be reported to the compliance officer.
+      - Violations can be reported anonymously through the EthicsLine hotline.
+  - id: KB18
+    title: Performance Reviews
+    paras:
+      - Performance reviews take place twice a year, in June and December.
+      - Reviews use a 5-point rating scale.
+      - Salary adjustments are effective from the first of January.
+  - id: KB19
+    title: Public Holidays
+    paras:
+      - The company observes 11 public holidays per year.
+      - The holiday calendar is published in the HR portal every November.
+      - Employees who work on a public holiday receive a compensatory day off.
+  - id: KB20
+    title: Equipment Return
+    paras:
+      - Departing employees must return all company equipment on their last working day.
+      - Unreturned laptops are charged at 800 dollars.
+      - Return equipment to the IT office on floor 2.
