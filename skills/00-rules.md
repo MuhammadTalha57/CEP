@@ -21,3 +21,12 @@
 
 ## End of session
 14. Update STATE.md (status, next 3 actions, decisions), list files to commit, one line each.
+
+## Engineering (Stages 4–7; added 12 Nov)
+15. Plan before code: every stage starts from an approved design (reports/design.md). Changes to apps, injection types, defenses or matrix size need user approval and a decisions-log line.
+16. One step = one commit, message `stageN.M: <what>`. A step is committed only when its tests pass (`pytest`, using the mock LLM backend). No unrelated changes in a step.
+17. Every design choice is tagged with its source: paper id + page, `[OURS]`, or `[INFERENCE]`.
+18. No hard-coded model names, URLs or keys in code: models in configs/models.yaml, secrets in environment variables (never committed).
+19. Same code locally and on AWS: only config/env changes between environments. Every trial is logged to results/ as JSONL; results are never edited by hand.
+20. AWS: budget alert set before the first launch; stop instances at the end of every session; record the hours used in STATE.md.
+21. Commits, pushes and PRs carry no AI attribution: no `Co-Authored-By: Claude` trailer, no "Generated with" line. The author is the user's git identity only.
