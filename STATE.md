@@ -19,7 +19,7 @@
 | 3 | Gap analysis | DONE | G1 + G2 + G3 chosen (12 Nov) |
 | 4 | Experiment design + harness | DONE | steps 4.1–4.8 committed; Kaggle pilot run 13 Nov (reports/pilot_kaggle-pilot.md) |
 | 5 | Dev runs on Kaggle (user) | IN PROGRESS | pilot DONE; next: baseline (defense=none) full matrix, n=30 |
-| 6 | Defenses + eval | TODO | D1–D5 + layered (design.md §5) |
+| 6 | Defenses + eval | IN PROGRESS | code DONE 13 Nov: D1 detector, D2 sanitize, D3 spotlight, D4 tool policy, layered (steps 6.1–6.5, 92 tests); D5 not built; Kaggle defense runs next |
 | 7 | AWS deployment + cloud runs | TODO | same Docker Compose on EC2 |
 | 8 | Paper draft | TODO | |
 
@@ -27,9 +27,9 @@
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
 
 ## Next actions (max 3)
-1. User: after the stage5.0 fix is pushed, run deploy/kaggle_run.ipynb with MODE="run", DEFENSE="none", MODELS = qwen3-1.7b, llama3.2-3b, gemma3-1b + qwen3-4b (approved 13 Nov); commit results_kaggle.zip.
-2. User (in parallel): AWS Budgets alert (~$30); check the EC2 GPU instance quota (request an increase now if it is 0).
-3. Claude (in parallel with 1): Stage 6 defenses D1–D4 + layered, one commit each; then set h1_technique from the baseline.
+1. User: finish the baseline run (DEFENSE="none", 4 models) and commit results_kaggle.zip.
+2. User: then defense runs on Kaggle with DEFENSE="all", one or two models per session (12 h limit), attaching the previous results zip so finished trials are skipped; commit each zip. Also: AWS Budgets alert + GPU quota.
+3. Claude: from the baseline, set h1_technique and write first results tables; then Stage 7 AWS deploy guide.
 
 ## Decisions log
 - 31 Oct — Citation counts required; fetched by GitHub Action `Fetch metrics` (OpenAlex, Semantic Scholar, Crossref; GitHub API).
@@ -43,6 +43,8 @@ Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, step
 - 12 Nov — Laptop: Ryzen 5 7430U, 7.4 GB RAM, no usable GPU -> local models <= 4B quantized, one at a time.
 - 13 Nov — Matrix as built: 8 + 14 + 9 attack cells x 30 variants + 90 clean = 1,020 trials per model per defense setting (H1 skipped until the pilot sets h1_technique; if the best technique is T7, H1 stays skipped as a duplicate).
 - 13 Nov — Deviations from design.md [OURS]: H2 in App A = payload splitting inside one message (App A has only the user channel); H2 in App C = trigger in the user request + note in the email. App B H2 not used (design listed H1, H3 for B).
+- 13 Nov — Defense design details [OURS unless cited]: D1 threshold 0.85 (P06 p4), CPU on Kaggle and AWS, score always logged (threshold analysis offline); D3 does not wrap the user's own message (trusted victim in B/C; App A = system-prompt hardening only); D4 = simplified CaMeL rule (P08 p1, p4): side-effect tool arguments must appear in the user request; layered output guard is deliberately weaker than the scorer (no base64/rot13/reversal) so the scorer is not reused as the defense. Per-app defense lists in configs/experiment.yaml (A: 4 settings, B: 5, C: 5).
+- 13 Nov — D5 (self-check) NOT built: needs a second LLM call inside the defense layer and P05 p11 shows weak judges approve up to 49.7% unsafe outputs; dropped for time, reported as a limitation.
 - 13 Nov — Pilot (Kaggle, 2x T4, Ollama 0.40.16, Python 3.13, commit f64291d): all 63 trials valid except gemma3-1b App C (no tool support in Ollama -> gemma3-1b is used for Apps A and B only, as planned in models.yaml). The first trial per model included 40–112 s model load, so the pilot's hour estimates were inflated; without it: qwen3-1.7b 0.66 h, llama3.2-3b 0.14 h, gemma3-1b 0.04 h per defense setting. Fix: unlogged warm-up per model (stage5.0).
 - 13 Nov — Pilot observation (not a result): llama3.2-3b wrote the attacker's email as text without calling send_email in 3/4 agent attacks -> new flag `target_in_output` (text-only compliance), reported separately; ASR still counts executed tool calls only (design.md §0.2).
 - 13 Nov — n stays 30 per cell: GPU time is cheap (~0.9 h per defense setting for 3 models). Proposed: add qwen3-4b (supports tools; same family as qwen3-1.7b, P05 p7 reports 71.3% vs 0% for qwen3:1.7b vs larger models) so App C has 3 models — APPROVED by user 13 Nov.
