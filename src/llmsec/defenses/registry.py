@@ -3,8 +3,9 @@ from __future__ import annotations
 
 from .base import Defense, NoDefense
 from .detector import D1Detector
+from .sanitize import D2Sanitize
 
-DEFENSES: dict[str, type[Defense]] = {"none": NoDefense, "d1_detector": D1Detector}
+DEFENSES: dict[str, type[Defense]] = {"none": NoDefense, "d1_detector": D1Detector, "d2_sanitize": D2Sanitize}
 
 
 def get_defense(name: str) -> Defense:
