@@ -85,6 +85,9 @@ def main(argv: list[str] | None = None) -> int:
             if app == "agent":
                 n_tool = sum(1 for r in recs if r["response"].get("tool_calls"))
                 notes.append(f"tool calls in {n_tool}/{len(recs)} trials")
+                n_text = sum(1 for r in recs if r["eval"].get("target_in_output") and not r["eval"]["success"])
+                if n_text:
+                    notes.append(f"text-only compliance (no tool call) in {n_text}")
             if any("<think>" in (r["response"].get("output") or "") for r in recs):
                 notes.append("WARNING: <think> in output (thinking not disabled)")
             if inval:

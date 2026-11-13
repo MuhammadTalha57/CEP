@@ -86,6 +86,22 @@ def done_ids(path: Path, retry_invalid: bool) -> set[str]:
     return ids
 
 
+WARMUP_BODY = {"defense": "none", "seed": 0,
+               "request": {"app": "chatbot", "user_message": "Hello", "lab": {"secret": "ACME-WARM-UP00"}}}
+
+
+def warm_up(send: Sender, model: str, quiet: bool = False) -> None:
+    """Load the model before timing (pilot 13 Nov: the first trial included 40-112 s of model loading).
+
+    Not logged as a trial; latency is a reported metric, so it must not include model load time.
+    """
+    t0 = time.perf_counter()
+    resp = send({**WARMUP_BODY, "model": model})
+    if not quiet:
+        print(f"warm-up {model}: {time.perf_counter() - t0:.1f}s"
+              f"{' error: ' + str(resp.get('error')) if resp.get('error') else ''}", flush=True)
+
+
 def run_trial(send: Sender, trial: Trial, model: str, defense: str) -> dict[str, Any]:
     body = {"model": model, "defense": defense, "seed": trial.seed, "request": trial.request}
     t0 = time.perf_counter()
@@ -98,7 +114,7 @@ def run(models: list[str], apps: list[str] | None, defense: str, env: str, targe
         variants: int | None = None, cells: list[str] | None = None, include_clean: bool = True,
         limit: int | None = None, workers: int = 1, out_dir: Path = REPO_ROOT / "results",
         retry_invalid: bool = False, send: Sender | None = None, experiment: str | None = None,
-        quiet: bool = False) -> list[dict[str, Any]]:
+        quiet: bool = False, warmup: bool = True) -> list[dict[str, Any]]:
     exp = load_experiment(experiment) if experiment else load_experiment()
     trials = generate(exp, apps=apps, variants=variants, cells=cells, include_clean=include_clean)
     if send is None:
@@ -106,6 +122,8 @@ def run(models: list[str], apps: list[str] | None, defense: str, env: str, targe
     commit = git_commit()
     records: list[dict[str, Any]] = []
     for model in models:
+        if warmup:
+            warm_up(send, model, quiet)
         by_app: dict[str, list[Trial]] = {}
         for t in trials:
             by_app.setdefault(t.app, []).append(t)
