@@ -17,8 +17,8 @@
 | 1 | Extract 13 papers | DONE | P01–P13 in data/papers/ |
 | 2 | Rank + exclude | DONE | reports/ranking.md; keep 10, exclude P07, P11, P12 |
 | 3 | Gap analysis | DONE | G1 + G2 + G3 chosen (12 Nov) |
-| 4 | Experiment design + harness | DONE (code) | design.md approved 13 Nov; steps 4.1–4.7 committed, 62 tests pass with the mock model; Docker image built and smoke-tested. Real-model pilot not run yet |
-| 5 | Dev runs on Kaggle (user) | TODO | pilot first (deploy/README.md §1b), then baseline runs |
+| 4 | Experiment design + harness | DONE | steps 4.1–4.8 committed; Kaggle pilot run 13 Nov (reports/pilot_kaggle-pilot.md) |
+| 5 | Dev runs on Kaggle (user) | IN PROGRESS | pilot DONE; next: baseline (defense=none) full matrix, n=30 |
 | 6 | Defenses + eval | TODO | D1–D5 + layered (design.md §5) |
 | 7 | AWS deployment + cloud runs | TODO | same Docker Compose on EC2 |
 | 8 | Paper draft | TODO | |
@@ -27,9 +27,9 @@
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
 
 ## Next actions (max 3)
-1. User: Kaggle account + phone verification; after the code is pushed to master, run deploy/kaggle_run.ipynb with MODE="pilot" (deploy/README.md §1b); unzip results_kaggle-pilot.zip in the repo root and commit.
+1. User: after the stage5.0 fix is pushed, run deploy/kaggle_run.ipynb with MODE="run", DEFENSE="none", MODELS = qwen3-1.7b, llama3.2-3b, gemma3-1b (+ qwen3-4b if approved); commit results_kaggle.zip.
 2. User (in parallel): AWS Budgets alert (~$30); check the EC2 GPU instance quota (request an increase now if it is 0).
-3. Claude: read reports/pilot_kaggle-pilot.md -> pick models, set n and h1_technique, then Stage 6 defenses D1–D4 + layered (one commit each).
+3. Claude (in parallel with 1): Stage 6 defenses D1–D4 + layered, one commit each; then set h1_technique from the baseline.
 
 ## Decisions log
 - 31 Oct — Citation counts required; fetched by GitHub Action `Fetch metrics` (OpenAlex, Semantic Scholar, Crossref; GitHub API).
@@ -43,6 +43,10 @@ Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, step
 - 12 Nov — Laptop: Ryzen 5 7430U, 7.4 GB RAM, no usable GPU -> local models <= 4B quantized, one at a time.
 - 13 Nov — Matrix as built: 8 + 14 + 9 attack cells x 30 variants + 90 clean = 1,020 trials per model per defense setting (H1 skipped until the pilot sets h1_technique; if the best technique is T7, H1 stays skipped as a duplicate).
 - 13 Nov — Deviations from design.md [OURS]: H2 in App A = payload splitting inside one message (App A has only the user channel); H2 in App C = trigger in the user request + note in the email. App B H2 not used (design listed H1, H3 for B).
+- 13 Nov — Pilot (Kaggle, 2x T4, Ollama 0.40.16, Python 3.13, commit f64291d): all 63 trials valid except gemma3-1b App C (no tool support in Ollama -> gemma3-1b is used for Apps A and B only, as planned in models.yaml). The first trial per model included 40–112 s model load, so the pilot's hour estimates were inflated; without it: qwen3-1.7b 0.66 h, llama3.2-3b 0.14 h, gemma3-1b 0.04 h per defense setting. Fix: unlogged warm-up per model (stage5.0).
+- 13 Nov — Pilot observation (not a result): llama3.2-3b wrote the attacker's email as text without calling send_email in 3/4 agent attacks -> new flag `target_in_output` (text-only compliance), reported separately; ASR still counts executed tool calls only (design.md §0.2).
+- 13 Nov — n stays 30 per cell: GPU time is cheap (~0.9 h per defense setting for 3 models). Proposed: add qwen3-4b (supports tools; same family as qwen3-1.7b, P05 p7 reports 71.3% vs 0% for qwen3:1.7b vs larger models) so App C has 3 models — pending user OK.
+- 13 Nov — H1 technique cannot be chosen from the pilot (it tested only T2/T7); it is set from the baseline (best of T1–T6@C1 in App B), then H1 cells run as an add-on.
 - 13 Nov — Model runs move from the laptop to **Kaggle Notebooks** (free GPU, ~30 GPU h/week reported, 12 h sessions; user decision). Nothing else changes: same Ollama models, trials, temperature 0 and logs. The "local" side of G3 is now the Kaggle notebook (in-process, Ollama native) vs the AWS-hosted app (Docker, HTTP); reported as development vs production deployment. Laptop = code + mock tests only. Free LLM APIs rejected for main runs (rate limits, model versions differ from the Ollama files, seed control).
 - 13 Nov — No AI attribution in commits/pushes/PRs (user rule; skills/00-rules.md rule 21).
 - 13 Nov — App B naive loader keeps hidden HTML, alt/ARIA, PDF white/tiny text and PDF metadata in the indexed text [OURS, follows P04 p3 / P13 p3 settings]; BM25 top-3; all 10 attack targets retrieve their poisoned doc for all 7 carriers, and all 30 clean questions retrieve their doc (tests).
