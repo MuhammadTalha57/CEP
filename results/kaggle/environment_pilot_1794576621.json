@@ -1,0 +1,14 @@
+{
+  "env": "kaggle",
+  "commit": "f64291d",
+  "mode": "pilot",
+  "models": [
+    "qwen3-1.7b",
+    "llama3.2-3b",
+    "gemma3-1b"
+  ],
+  "gpu": "Tesla T4\nTesla T4",
+  "ollama": "ollama version is 0.40.16",
+  "python": "Python 3.13.16",
+  "utc": "2026-11-13T13:30:21Z"
+}
