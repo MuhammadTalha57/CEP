@@ -67,6 +67,19 @@ def http_sender(target: str, api_key: str, timeout: float = 600.0,
     return send
 
 
+def defenses_for(exp: dict[str, Any], app: str, defense: str) -> list[str]:
+    """`all` = the app's defense list in experiment.yaml; otherwise the single named defense."""
+    if defense == "all":
+        return list(exp["apps"][app].get("defenses", ["none"]))
+    return [defense]
+
+
+def model_supports_tools(model: str) -> bool:
+    from ..llm.factory import load_specs
+    spec = load_specs().get(model)
+    return spec is None or spec.supports_tools
+
+
 def out_path(out_dir: Path, env: str, model: str, app: str, defense: str) -> Path:
     return out_dir / env / model / f"{app}__{defense}.jsonl"
 
@@ -127,19 +140,23 @@ def run(models: list[str], apps: list[str] | None, defense: str, env: str, targe
         by_app: dict[str, list[Trial]] = {}
         for t in trials:
             by_app.setdefault(t.app, []).append(t)
-        for app, app_trials in by_app.items():
-            path = out_path(out_dir, env, model, app, defense)
+        for app, app_trials, dname in [(a, ts, d) for a, ts in by_app.items() for d in defenses_for(exp, a, defense)]:
+            if app == "agent" and not model_supports_tools(model):
+                if not quiet:
+                    print(f"[{env}] {model} agent: skipped (model has no tool support)", flush=True)
+                continue
+            path = out_path(out_dir, env, model, app, dname)
             path.parent.mkdir(parents=True, exist_ok=True)
             skip = done_ids(path, retry_invalid)
             todo = [t for t in app_trials if t.trial_id not in skip][: limit or None]
             if not quiet:
-                print(f"[{env}] {model} {app} defense={defense}: {len(todo)} to run, {len(skip)} already done",
+                print(f"[{env}] {model} {app} defense={dname}: {len(todo)} to run, {len(skip)} already done",
                       flush=True)
             with path.open("a", encoding="utf-8") as fh, ThreadPoolExecutor(max_workers=workers) as pool:
-                for i, res in enumerate(pool.map(lambda tr: run_trial(send, tr, model, defense), todo), 1):
+                for i, res in enumerate(pool.map(lambda tr: run_trial(send, tr, model, dname), todo), 1):
                     tr: Trial = res["trial"]
                     rec = {"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"), "env": env,
-                           "target": target, "commit": commit, "model": model, "defense": defense,
+                           "target": target, "commit": commit, "model": model, "defense": dname,
                            "temperature": exp.get("temperature", 0.0), **tr.to_dict(),
                            "response": res["resp"], "wall_ms": round(res["wall_ms"], 1), "eval": res["eval"]}
                     fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -155,7 +172,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--models", nargs="+", required=True)
     ap.add_argument("--apps", nargs="+", choices=["chatbot", "rag", "agent"])
-    ap.add_argument("--defense", default="none")
+    ap.add_argument("--defense", default="none", help="defense name, or 'all' for each app's list in experiment.yaml")
     ap.add_argument("--env", default="local", help="label for results/<env>/ (e.g. local, aws)")
     ap.add_argument("--target", default="inproc", help="'inproc' or the server base URL")
     ap.add_argument("--variants", type=int, help="override variants per cell")
