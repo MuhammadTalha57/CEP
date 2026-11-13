@@ -1,0 +1,14 @@
+# Defense settings (design.md §5). Changes need user approval (skills/00-rules.md rule 15).
+
+detector:                       # D1 (P03 p8-9 detector family; P09 p8 same model; P06 p4 gateway blocking)
+  model: protectai/deberta-v3-base-prompt-injection-v2   # 184M, public on Hugging Face
+  threshold: 0.85               # P06 p4 blocks at 0.85 confidence; every score is logged, so other thresholds can be analysed offline
+  device: cpu                   # same device on Kaggle and AWS, so D1 latency is comparable (G3)
+  window_chars: 1500            # long texts are scored in overlapping windows; max score is used
+  overlap_chars: 200
+
+spotlight:                      # D3 (P08 baselines: spotlighting; P05 p10 system-prompt defence)
+  tag: UNTRUSTED_DATA
+
+output_guard:                   # part of `layered` [OURS]: simple DLP, deliberately weaker than the scorer
+  allowed_domains: [acme-corp.example, acme-home.example]

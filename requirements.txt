@@ -8,3 +8,8 @@ pdfplumber>=0.11
 reportlab>=4.0
 beautifulsoup4>=4.12
 pytest>=8.0
+# D1 detector (Stage 6). Docker installs the CPU build of torch first (see Dockerfile).
+torch>=2.2
+transformers>=4.40
+sentencepiece>=0.2
+protobuf>=4.0
