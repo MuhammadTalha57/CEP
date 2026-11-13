@@ -22,7 +22,22 @@ ollama --version
 
 Record the Ollama version in STATE.md. `OLLAMA_URL` defaults to `http://localhost:11434/v1`; to change it, copy `.env.example` to `.env` and set the variable in your shell.
 
-## 2. Timing pilot (step 4.7)
+## 1b. Model runs on Kaggle (chosen 13 Nov; the laptop only runs code and mock tests)
+
+Notebook: `deploy/kaggle_run.ipynb`. It installs Ollama on Kaggle's free GPU, pulls the same models, clones
+this repo (branch `master`, so push first), runs the pilot or the experiments in-process, and writes
+`results_<env>.zip` to the Output tab.
+
+1. kaggle.com → Create → New Notebook → File → Import Notebook → upload `deploy/kaggle_run.ipynb`.
+2. Settings: Accelerator **GPU T4 x2** (or P100), Internet **On** (phone verification needed once).
+3. Pilot: keep `MODE = "pilot"`, Run All (~minutes). Long runs: `MODE = "run"`, then *Save Version → Save & Run All*.
+4. Download the zip, unzip it **in the repo root**, commit `results/` and `reports/pilot_*.md`.
+5. Interrupted run: upload the last zip as a Kaggle Dataset, attach it, re-run; finished trials are skipped.
+
+Results land in `results/kaggle/` (experiments) and `results/kaggle-pilot/` (pilot). The environment
+(GPU, Ollama version, commit) is logged in `results/<env>/environment_*.json`.
+
+## 2. Timing pilot on the laptop (optional; the pilot normally runs on Kaggle, see 1b)
 
 ```bash
 .venv/Scripts/python -m llmsec.harness.pilot --models qwen3-1.7b llama3.2-3b gemma3-1b

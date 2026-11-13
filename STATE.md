@@ -18,7 +18,7 @@
 | 2 | Rank + exclude | DONE | reports/ranking.md; keep 10, exclude P07, P11, P12 |
 | 3 | Gap analysis | DONE | G1 + G2 + G3 chosen (12 Nov) |
 | 4 | Experiment design + harness | DONE (code) | design.md approved 13 Nov; steps 4.1–4.7 committed, 62 tests pass with the mock model; Docker image built and smoke-tested. Real-model pilot not run yet |
-| 5 | Local runs (user) | TODO | pilot first (deploy/README.md §2), then reduced-n runs |
+| 5 | Dev runs on Kaggle (user) | TODO | pilot first (deploy/README.md §1b), then baseline runs |
 | 6 | Defenses + eval | TODO | D1–D5 + layered (design.md §5) |
 | 7 | AWS deployment + cloud runs | TODO | same Docker Compose on EC2 |
 | 8 | Paper draft | TODO | |
@@ -27,9 +27,9 @@
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
 
 ## Next actions (max 3)
-1. User: install Ollama, pull qwen3:1.7b, llama3.2:3b, gemma3:1b, run the pilot (deploy/README.md §1–2), commit reports/pilot_local-pilot.md + results/local-pilot/.
+1. User: Kaggle account + phone verification; after the code is pushed to master, run deploy/kaggle_run.ipynb with MODE="pilot" (deploy/README.md §1b); unzip results_kaggle-pilot.zip in the repo root and commit.
 2. User (in parallel): AWS Budgets alert (~$30); check the EC2 GPU instance quota (request an increase now if it is 0).
-3. Claude: read the pilot report -> pick models, set n and h1_technique, then Stage 6 defenses D1–D4 + layered (one commit each).
+3. Claude: read reports/pilot_kaggle-pilot.md -> pick models, set n and h1_technique, then Stage 6 defenses D1–D4 + layered (one commit each).
 
 ## Decisions log
 - 31 Oct — Citation counts required; fetched by GitHub Action `Fetch metrics` (OpenAlex, Semantic Scholar, Crossref; GitHub API).
@@ -43,7 +43,7 @@ Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, step
 - 12 Nov — Laptop: Ryzen 5 7430U, 7.4 GB RAM, no usable GPU -> local models <= 4B quantized, one at a time.
 - 13 Nov — Matrix as built: 8 + 14 + 9 attack cells x 30 variants + 90 clean = 1,020 trials per model per defense setting (H1 skipped until the pilot sets h1_technique; if the best technique is T7, H1 stays skipped as a duplicate).
 - 13 Nov — Deviations from design.md [OURS]: H2 in App A = payload splitting inside one message (App A has only the user channel); H2 in App C = trigger in the user request + note in the email. App B H2 not used (design listed H1, H3 for B).
-- 13 Nov — Local runs use native Ollama on Windows (Docker's VM costs RAM on a 7.4 GB laptop); AWS uses the Docker stack. This serving-stack difference is part of what G3 measures and is reported.
+- 13 Nov — Model runs move from the laptop to **Kaggle Notebooks** (free GPU, ~30 GPU h/week reported, 12 h sessions; user decision). Nothing else changes: same Ollama models, trials, temperature 0 and logs. The "local" side of G3 is now the Kaggle notebook (in-process, Ollama native) vs the AWS-hosted app (Docker, HTTP); reported as development vs production deployment. Laptop = code + mock tests only. Free LLM APIs rejected for main runs (rate limits, model versions differ from the Ollama files, seed control).
 - 13 Nov — No AI attribution in commits/pushes/PRs (user rule; skills/00-rules.md rule 21).
 - 13 Nov — App B naive loader keeps hidden HTML, alt/ARIA, PDF white/tiny text and PDF metadata in the indexed text [OURS, follows P04 p3 / P13 p3 settings]; BM25 top-3; all 10 attack targets retrieve their poisoned doc for all 7 carriers, and all 30 clean questions retrieve their doc (tests).
 - 12 Nov — Approved 13 Nov: 3 apps as HTTP API only (chatbot, RAG, tool agent), techniques T1–T7 x carriers C0–C9 + hybrids H1–H3, defenses D1–D5 + layered; temperature 0 with 30 payload variants per cell. Details: reports/design.md.
