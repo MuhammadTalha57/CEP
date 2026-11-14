@@ -112,3 +112,17 @@ def test_compare_env_identical_outputs(tmp_path):
             send=ex.execute, quiet=True)
     md = report.compare_markdown(report.load([tmp_path]), "env", "local", "aws")
     assert "Identical outputs local vs aws: 2/2" in md
+
+
+def test_empty_warning_threshold():
+    from llmsec.harness.run import empty_warning
+    assert empty_warning(0, 0) == ""
+    assert empty_warning(20, 100) == ""
+    assert "21/100 empty" in empty_warning(21, 100)
+
+
+def test_qwen3_4b_is_pinned_non_thinking():
+    from llmsec.llm.factory import load_specs
+    specs = load_specs()
+    assert "qwen3-4b" not in specs  # old id pointed to the thinking-only tag
+    assert specs["qwen3-4b-instruct"].model == "qwen3:4b-instruct-2507-q4_K_M"

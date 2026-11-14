@@ -23,12 +23,14 @@ models:
     model: gemma3:1b
     supports_tools: false        # [verify in pilot] used for apps A and B only if no tool support
 
-  - id: qwen3-4b
+  # Pinned tag. The bare `qwen3:4b` tag now points to Qwen3-4B-Thinking-2507 (thinking-only, ignores /no_think):
+  # the 13 Nov Kaggle baseline got 73% empty outputs with it (results/excluded/, STATE.md 14 Nov).
+  # Instruct-2507 is the non-thinking 4B; it is a later checkpoint than the qwen3:4b in P05 (not comparable).
+  - id: qwen3-4b-instruct
     backend: openai_compat
     base_url: ${OLLAMA_URL:-http://localhost:11434/v1}
-    model: qwen3:4b
+    model: qwen3:4b-instruct-2507-q4_K_M
     supports_tools: true
-    system_suffix: "/no_think"
 
   - id: mock
     backend: mock

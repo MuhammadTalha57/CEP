@@ -115,6 +115,20 @@ def warm_up(send: Sender, model: str, quiet: bool = False) -> None:
               f"{' error: ' + str(resp.get('error')) if resp.get('error') else ''}", flush=True)
 
 
+EMPTY_WARN_RATE = 0.2
+
+
+def empty_warning(n_empty: int, n: int) -> str:
+    """Flag a broken model setup (14 Nov: a thinking-only model spent all tokens on hidden reasoning -> empty answers).
+
+    Empty answers count as failed attacks, so a high rate silently deflates ASR.
+    """
+    if n and n_empty / n > EMPTY_WARN_RATE:
+        return (f"{n_empty}/{n} empty outputs (>{EMPTY_WARN_RATE:.0%}); check the model is not in thinking mode "
+                f"and max_tokens is large enough")
+    return ""
+
+
 def run_trial(send: Sender, trial: Trial, model: str, defense: str) -> dict[str, Any]:
     body = {"model": model, "defense": defense, "seed": trial.seed, "request": trial.request}
     t0 = time.perf_counter()
@@ -152,6 +166,7 @@ def run(models: list[str], apps: list[str] | None, defense: str, env: str, targe
             if not quiet:
                 print(f"[{env}] {model} {app} defense={dname}: {len(todo)} to run, {len(skip)} already done",
                       flush=True)
+            n_empty = 0
             with path.open("a", encoding="utf-8") as fh, ThreadPoolExecutor(max_workers=workers) as pool:
                 for i, res in enumerate(pool.map(lambda tr: run_trial(send, tr, model, dname), todo), 1):
                     tr: Trial = res["trial"]
@@ -162,9 +177,13 @@ def run(models: list[str], apps: list[str] | None, defense: str, env: str, targe
                     fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
                     fh.flush()
                     records.append(rec)
+                    n_empty += bool(res["eval"].get("empty_output"))
                     if not quiet and (i % 10 == 0 or i == len(todo)):
                         print(f"  {i}/{len(todo)} last={tr.trial_id} success={res['eval']['success']} "
                               f"valid={res['eval']['valid']} wall={res['wall_ms'] / 1000:.1f}s", flush=True)
+            warn = empty_warning(n_empty, len(todo))
+            if warn and not quiet:
+                print(f"  WARNING {model} {app} defense={dname}: {warn}", flush=True)
     return records
 
 
