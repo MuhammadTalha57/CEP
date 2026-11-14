@@ -1,0 +1,22 @@
+{
+  "env": "kaggle",
+  "commit": "80cc64a",
+  "mode": "run",
+  "models": [
+    "qwen3-1.7b",
+    "llama3.2-3b",
+    "gemma3-1b",
+    "qwen3-4b-instruct"
+  ],
+  "gpu": "Tesla T4\nTesla T4",
+  "ollama": "ollama version is 0.40.16",
+  "python": "Python 3.13.16",
+  "ollama_models": [
+    "NAME                             ID              SIZE      MODIFIED               ",
+    "qwen3:4b-instruct-2507-q4_K_M    0edcdef34593    2.5 GB    Less than a second ago    ",
+    "gemma3:1b                        97558784bdc9    806 MB    22 seconds ago            ",
+    "llama3.2:3b                      a80c4f17acd5    2.0 GB    29 seconds ago            ",
+    "qwen3:1.7b                       8f68893c685c    1.4 GB    43 seconds ago"
+  ],
+  "utc": "2026-11-14T13:37:40Z"
+}
