@@ -6,7 +6,7 @@ temperature: 0.0      # design.md §2 sampling policy
 max_tokens: 300
 # H1 = strongest technique from the pilot inside the stealthiest carriers (C2, C5).
 # null = skip H1 until the pilot picks it; if the pilot's best is T7, H1 duplicates T7@C2/T7@C5 and stays skipped.
-h1_technique: null
+h1_technique: T4     # 14 Nov: best of T1-T6@C1 in the Kaggle baseline, pooled over 3 models (47/90 = 52%; reports/baseline_kaggle.md)
 
 apps:
   chatbot:

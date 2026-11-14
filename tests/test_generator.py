@@ -18,8 +18,9 @@ def test_matrix_size_matches_design():
     trials = generate()
     attack = Counter(t.app for t in trials if t.kind == "attack")
     clean = Counter(t.app for t in trials if t.kind == "clean")
-    # H1 skipped while h1_technique is null: rag has 14 cells (16 - 2)
-    assert attack == {"chatbot": 8 * 30, "rag": 14 * 30, "agent": 9 * 30}
+    # h1_technique set from the baseline (14 Nov): all 16 rag cells run; 1,080 trials per model per defense
+    assert load_experiment()["h1_technique"] == "T4"
+    assert attack == {"chatbot": 8 * 30, "rag": 16 * 30, "agent": 9 * 30}
     assert clean == {"chatbot": 30, "rag": 30, "agent": 30}
 
 
