@@ -2,7 +2,7 @@
 
 **Project:** Security Evaluation of Cloud-Hosted LLM Applications Against Prompt Injection (CEP_BRIEF.md)
 **Constraints:** Python · laptop is CPU-only, 7.4 GB RAM · open-source models only · solo · AWS credit ~$190 · repo public (master)
-**Deadline:** Sun 15 Nov 2026 (research paper; extended from 9 Nov). **Last updated:** 14 Nov 2026 (session 4)
+**Deadline:** Sun 15 Nov 2026 (research paper; extended from 9 Nov). **Last updated:** 15 Nov 2026 (session 4)
 
 ## Confirmed requirements
 - Attack evaluation (models x minimal apps x injection types) AND a proposed defense AND AWS deployment. Output = research paper.
@@ -18,8 +18,8 @@
 | 2 | Rank + exclude | DONE | reports/ranking.md; keep 10, exclude P07, P11, P12 |
 | 3 | Gap analysis | DONE | G1 + G2 + G3 chosen (12 Nov) |
 | 4 | Experiment design + harness | DONE | steps 4.1–4.8 committed; Kaggle pilot run 13 Nov (reports/pilot_kaggle-pilot.md) |
-| 5 | Dev runs on Kaggle (user) | IN PROGRESS | pilot DONE; baseline DONE for 4 models + H1 (14 Nov, 4,020 trials, reports/baseline_kaggle.md); defense runs next |
-| 6 | Defenses + eval | IN PROGRESS | code DONE 13 Nov: D1 detector, D2 sanitize, D3 spotlight, D4 tool policy, layered (steps 6.1–6.5, 92 tests); D5 not built; Kaggle defense runs next |
+| 5 | Dev runs on Kaggle (user) | DONE | baseline (reports/baseline_kaggle.md) and defense runs (reports/defense_kaggle.md), 4 models |
+| 6 | Defenses + eval | DONE 15 Nov | results in reports/defense_kaggle.md; D1–D4 + layered (steps 6.1–6.5); D5 not built (limitation) |
 | 7 | AWS deployment + cloud runs | TODO | same Docker Compose on EC2 |
 | 8 | Paper draft | TODO | |
 
@@ -27,9 +27,9 @@
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
 
 ## Next actions (max 3)
-1. User (Kaggle): DEFENSE="all", attach the newest results zip, one or two models per session (12 h limit; resume skips finished trials). Commit each zip. Also: AWS Budgets alert + GPU quota.
-2. Claude: Stage 7 AWS deploy guide (EC2 + Docker Compose, cost per hour, stop rules) while the defense runs go.
-3. Claude: once defense results are in, defense tables (ASR drop, utility cost, latency, McNemar) in reports/.
+1. Claude: Stage 7 AWS deploy guide (EC2 + Docker Compose, cost per hour, stop rules) and a reduced cloud matrix that fits the deadline.
+2. User: AWS Budgets alert + GPU quota, launch EC2, run the cloud matrix from Kaggle or the laptop against the HTTP endpoint.
+3. Claude: local-vs-cloud comparison (--compare-env), then Stage 8 paper draft.
 
 ## Decisions log
 - 31 Oct — Citation counts required; fetched by GitHub Action `Fetch metrics` (OpenAlex, Semantic Scholar, Crossref; GitHub API).
@@ -57,6 +57,7 @@ Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, step
 - 14 Nov — qwen3-1.7b (hybrid model, /no_think works) still gave ~4% empty single-call answers that stop at ~2.5 s (likely occasional thinking runoff). Kept as is (counted as failed attack / failed utility), reported as a limitation; changing its settings now would break comparability with the finished baseline.
 - 14 Nov — h1_technique = T4 (best of T1–T6@C1 pooled over 3 models, 47/90 = 52%; T7@C1 49%). H1@C2 and H1@C5 run as an add-on (resume skips finished trials).
 - 14 Nov — Baseline session 2 (commit 80cc64a): qwen3-4b-instruct 1,080 trials, 0 empty, 1 error; H1 add-on 60 trials per model. Same Ollama digests as session 1 for the other models. Main new finding: the two models that resist direct injection (llama3.2-3b, qwen3-4b-instruct) are the most vulnerable to indirect injection; H1@C2 (our hybrid) is the strongest RAG cell, 67% pooled.
+- 15 Nov — Defense runs (commit 48cdf39, two parallel Kaggle sessions): complete for 4 models; 6 invalid (HTTP 500 from Ollama, qwen3-4b agent), 0 false positives on clean tasks. Layered: chatbot 0%, RAG 7%, agent 0% pooled ASR with unchanged utility. Key finding: D2 normalization alone repairs the zero-width carrier (T7@C4 7% -> 55%); layered order normalize -> detect fixes it (4%). Residual: visible-text RAG injection (T1/T3/T4@C1 21–36% under layered). Threshold kept at 0.85 (no tuning on the test set).
 - 14 Nov — C4 zero-width carrier ~0% ASR (1/90; H3 0/90) with the poison retrieved every time: a finding (invisible characters break tokens for small models), not a bug.
 - 12 Nov — Approved 13 Nov: 3 apps as HTTP API only (chatbot, RAG, tool agent), techniques T1–T7 x carriers C0–C9 + hybrids H1–H3, defenses D1–D5 + layered; temperature 0 with 30 payload variants per cell. Details: reports/design.md.
 
