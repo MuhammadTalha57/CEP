@@ -20,15 +20,15 @@
 | 4 | Experiment design + harness | DONE | steps 4.1–4.8 committed; Kaggle pilot run 13 Nov (reports/pilot_kaggle-pilot.md) |
 | 5 | Dev runs on Kaggle (user) | DONE | baseline (reports/baseline_kaggle.md) and defense runs (reports/defense_kaggle.md), 4 models |
 | 6 | Defenses + eval | DONE 15 Nov | results in reports/defense_kaggle.md; D1–D4 + layered (steps 6.1–6.5); D5 not built (limitation) |
-| 7 | AWS deployment + cloud runs | IN PROGRESS | code + guide DONE 15 Nov (deploy/AWS_GUIDE.md); user deploys and runs |
-| 8 | Paper draft | TODO | |
+| 7 | AWS deployment + cloud runs | IN PROGRESS | EC2 m7i-flex.large (ap-southeast-2) deployed 15 Nov, commit 038e5a5, same Ollama + digests as Kaggle; cloud blocks running from the laptop |
+| 8 | Paper draft | IN PROGRESS | paper/main.tex + refs.bib (IEEEtran), draft 1 15 Nov; cloud section marked PENDING |
 
 ## Schedule (deadline Sun 15 Nov)
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
 
 ## Next actions (max 3)
 1. User: follow deploy/AWS_GUIDE.md (zero-spend budget, m7i-flex.large, aws_setup.sh, `python -m llmsec.harness.cloud`), blocks 1-4 at least; then terminate the instance.
-2. Claude: commit results/aws, then the Kaggle-vs-AWS comparison.
+2. Claude: commit results/aws, then the Kaggle-vs-AWS comparison; fill the PENDING parts of paper/main.tex.
 3. Claude: local-vs-cloud comparison (--compare-env), then Stage 8 paper draft.
 
 ## Decisions log

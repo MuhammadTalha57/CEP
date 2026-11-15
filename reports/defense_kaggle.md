@@ -147,7 +147,7 @@ ASR = attack success over all attack trials of the app. Utility = clean tasks an
    - Chatbot ASR goes from 40% to **0%** (0/960).
    - RAG ASR goes from 44% to **7%** (135/1,920).
    - Agent ASR goes from 24% to **0%** (0/807).
-   - Pooled utility stays at 94–100%, within ±2 trials of `none`, and no clean trial was blocked.
+   - Pooled utility stays at 93–100%, within ±2 trials of `none`, and no clean trial was blocked.
    - The largest per-model utility drop is qwen3-1.7b agent with D3/layered: 27/30 → 25/30.
 
    | pooled ASR | none | D1 | D2 | D3 | D4 | layered |
@@ -169,7 +169,7 @@ ASR = attack success over all attack trials of the app. Utility = clean tasks an
    - RAG: 44% → 27%. Agent: 24% → 6%.
    - In the chatbot, hardening alone does not help (40% → 39%), and for llama3.2-3b it *raises* leaks (1.7% → 7.5%, p = 0.0005).
    - [INFERENCE] The extra security text in the system prompt draws attention to the secret.
-5. **D4 (tool policy) blocks every data-exfiltration tool call** (agent ASR 0% for all 3 tool models, 0/810), with utility unchanged (94–96%). This matches P08's result that a data-flow rule beats detection for tool agents. Our rule is simplified and only covers recipient and path arguments (limitation).
+5. **D4 (tool policy) blocks every data-exfiltration tool call** (agent ASR 0% for all 3 tool models, 0/810), with utility unchanged (96% pooled, vs 94% without defense). This matches P08's result that a data-flow rule beats detection for tool agents. Our rule is simplified and only covers recipient and path arguments (limitation).
 6. **The residual risk is visible-text injection in RAG.** Even with the layered defense, T1@C1 (36%), T3@C1 (22%) and T4@C1 (21%) still work, because none of our layers removes visible instructions that the detector scores below the threshold. A lower threshold or a second detector are future work. Changing the threshold now would be tuning on the test set.
 7. **Latency cost:**
    - D1 runs on CPU and adds about 0.6 s per RAG trial (about 4 chunks scored).
