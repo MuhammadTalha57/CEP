@@ -32,8 +32,8 @@ printf 'APP_API_KEY=%s\nSERVER_ENV=aws-ec2-%s\n' "$KEY" "$ITYPE" > .env && chmod
 echo "== 4/6 build and start the stack (first build takes several minutes)"
 sudo docker compose up -d --build
 
-echo "== 5/6 pull models"
-for m in $MODELS; do sudo docker compose exec -T ollama ollama pull "$m" | tail -1; done
+echo "== 5/6 pull models (stdin from /dev/null: docker compose exec -T can hang waiting for input)"
+for m in $MODELS; do sudo docker compose exec -T ollama ollama pull "$m" </dev/null; done
 
 echo "== 6/6 health + warm-up (loads gemma3 and downloads the D1 detector once)"
 for i in $(seq 1 30); do curl -sf localhost:8000/health >/dev/null && break; sleep 2; done
@@ -44,7 +44,7 @@ curl -s -X POST localhost:8000/v1/run -H "X-API-Key: $KEY" -H "Content-Type: app
 
 python3 - "$COMMIT" "$ITYPE" "$AZ" <<'PY' > ~/environment_aws.json
 import json, subprocess, sys, time
-sh = lambda c: subprocess.run(c, shell=True, capture_output=True, text=True).stdout.strip()
+sh = lambda c: subprocess.run(c, shell=True, capture_output=True, text=True, stdin=subprocess.DEVNULL).stdout.strip()
 print(json.dumps({
     "env": "aws", "commit": sys.argv[1], "instance_type": sys.argv[2], "availability_zone": sys.argv[3],
     "cpu": sh("lscpu | grep 'Model name' | sed 's/.*: *//'"), "vcpus": sh("nproc"),
