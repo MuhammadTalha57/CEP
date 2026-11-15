@@ -1,5 +1,6 @@
-% Draft 1 (15 Nov 2026). Every number comes from results/ (via reports/*.md) or from paper/facts.md (paper + page).
-% Items marked \pending{...} are filled after the AWS cloud run (Stage 7).
+% Draft 2 (15 Nov 2026): draft 1 edited with the academic-humanizer audit (shorter sentences, claims matched
+% to evidence, no [Inference] tags in the body). Every number comes from results/ (via reports/*.md) or from
+% paper/facts.md (paper + page). Items marked \pending{...} are filled after the AWS cloud run (Stage 7).
 \documentclass[conference]{IEEEtran}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -19,13 +20,18 @@
 \maketitle
 
 \begin{abstract}
-We evaluate how small open-weight language models behave when they are deployed inside three typical LLM applications (a support chatbot, a retrieval-augmented question-answering service and a tool-using email agent) and attacked through three channels: the user message, retrieved documents and tool outputs.
-We combine seven paper-defined injection techniques with ten carriers, including hidden HTML, zero-width characters and invisible PDF text, and add three hybrid attacks.
-Success is decided by deterministic checks with random per-trial canaries, never by an LLM judge.
-On four models (qwen3-1.7b, llama3.2-3b, gemma3-1b, qwen3-4b-instruct) and 19{,}020 logged trials we find that resistance to direct injection does not transfer to indirect injection: the two models that almost never leak a secret when asked directly (0--10\%) are the most vulnerable to injected documents (up to 97\%) and tool outputs (up to 77\%).
-A channel-aware layered defense built from paper-defined components reduces the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG app and from 24\% to 0\% in the agent, with no false positives on clean tasks.
-We also show that a text normalizer used on its own can \emph{repair} an obfuscated payload (7\%~$\to$~55\% success), so the order of defense layers matters.
-Finally, we deploy the same container stack as a cloud-hosted service on AWS and attack it over HTTP with the same trials \pending{cloud result sentence}.
+We evaluate small open-weight language models inside three common LLM applications: a support chatbot, a retrieval-augmented question-answering (RAG) service and a tool-using email agent.
+Each application is attacked through one channel: the user message, a retrieved document or a tool output.
+The attack matrix combines seven paper-defined injection techniques with ten carriers, including hidden HTML, zero-width characters and invisible PDF text, plus three hybrid attacks.
+Deterministic checks with random per-trial canaries decide success; no LLM judge is used.
+We ran 19{,}020 trials on four models (qwen3-1.7b, llama3.2-3b, gemma3-1b, qwen3-4b-instruct).
+Resistance to direct injection did not carry over to indirect injection.
+The two models that leaked a secret in 0--10\% of direct attacks were the most vulnerable to injected documents (53--67\% pooled, up to 97\% per cell).
+One of them, qwen3-4b-instruct, was also the most vulnerable to injected tool outputs (43.7\%, up to 77\% per cell).
+A channel-aware layered defense, built from paper-defined components, reduced the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG app and from 24\% to 0\% in the agent.
+It blocked no clean task.
+Used on its own, a text normalizer repaired an obfuscated payload and raised its success from 7\% to 55\%, so the order of defense layers matters.
+Finally, we deployed the same container stack as a cloud-hosted service on AWS and attacked it over HTTP with the same trials \pending{cloud result sentence}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -34,40 +40,51 @@ prompt injection, large language models, retrieval-augmented generation, LLM age
 
 % ---------------------------------------------------------------------------------------------
 \section{Introduction}
-LLM applications are increasingly deployed as cloud-hosted services that combine a model with untrusted text: user messages, documents retrieved from a knowledge base and outputs of tools such as email or web access.
-Prompt injection, instructions hidden in that text, can make the application leak secrets, give manipulated answers or perform actions the user never asked for.
+A cloud-hosted LLM application passes untrusted text to its model: user messages, documents retrieved from a knowledge base and the outputs of tools such as email or web access.
+Prompt injection hides instructions in that text.
+A successful injection can make the application leak a secret, return a manipulated answer or perform an action the user never requested.
 
-Prior work studies these threats mostly in isolation.
-Jaiswal \emph{et al.}~\cite{P05} measure direct injection on the same small open models we use (e.g.\ 71.3\% for qwen3:1.7b and 62.8\% for gemma3:1b~\cite[p.~7]{P05}) but test only direct prompts.
-Guo and Wei~\cite{P04} and Guler and Aydin~\cite{P13} study hidden carriers in RAG documents (HTML and PDF), and CaMeL~\cite{P08} defends tool agents by design, but on different models, apps and success metrics.
-Our gap analysis of ten papers found no study that (i) tests the same small open models across direct, document and tool-output injection with one success checker and confidence intervals, (ii) evaluates defenses end-to-end in RAG and tool apps with utility and latency cost, or (iii) measures whether moving the application to a cloud host changes the result for the same model.
+Prior work studies these channels separately.
+Jaiswal \emph{et al.}~\cite{P05} measure direct injection on small open models, e.g.\ 71.3\% for qwen3:1.7b and 62.8\% for gemma3:1b~\cite[p.~7]{P05}, but test only direct prompts.
+Guo and Wei~\cite{P04} and Guler and Aydin~\cite{P13} study hidden carriers in RAG documents (HTML and PDF).
+CaMeL~\cite{P08} defends tool agents by design.
+These studies use different models, applications and success metrics, so their results cannot be compared directly.
+Our gap analysis of ten papers found three open questions.
+First, no study tests the same small open models across direct, document and tool-output injection with one success checker and confidence intervals.
+Second, no study evaluates defenses end-to-end in RAG and tool applications together with their utility and latency cost.
+Third, no study measures whether moving the application to a cloud host changes the outcome for the same model.
 
 \textbf{Contributions.}
 \begin{itemize}
-\item A reproducible lab of three minimal LLM apps behind one HTTP API, with a technique~$\times$~carrier attack matrix (7 techniques, 10 carriers, 3 hybrids) and deterministic success checks (Section~\ref{sec:method}).
-\item A measurement on four open models (19{,}020 trials, Wilson 95\% CIs) showing that direct-injection robustness and indirect-injection robustness are different properties (Section~\ref{sec:baseline}).
-\item An end-to-end evaluation of four paper-defined defenses and our channel-aware layered defense, including utility, false positives and latency, and the finding that normalization must precede detection (Section~\ref{sec:defense}).
-\item A paired comparison of the development deployment (Kaggle notebook) and a cloud-hosted deployment (AWS EC2, Docker, HTTP) on identical trials (Section~\ref{sec:cloud}).
+\item A reproducible lab of three minimal LLM applications behind one HTTP API. The attack matrix crosses 7 techniques with 10 carriers and adds 3 hybrids, and success is checked deterministically (Section~\ref{sec:method}).
+\item A measurement on four open models (19{,}020 trials, Wilson 95\% CIs). The two models most robust to direct injection (0--1.7\% ASR) were the most vulnerable to injected documents (53--67\%) (Section~\ref{sec:baseline}).
+\item An end-to-end evaluation of four paper-defined defenses and our channel-aware layered defense. The layered defense reached 0\%, 7\% and 0\% ASR with no clean task blocked. We also find that normalization must precede detection: alone it raised one carrier from 7\% to 55\% (Section~\ref{sec:defense}).
+\item A paired comparison of a development deployment (Kaggle notebook) and a cloud-hosted deployment (AWS EC2, Docker, HTTP) on identical trials (Section~\ref{sec:cloud}).
 \end{itemize}
 All code, configurations and raw JSONL logs are public~\cite{repo}.
 
 % ---------------------------------------------------------------------------------------------
 \section{Background and Related Work}
 \textbf{Direct injection techniques.}
-Shi \emph{et al.}~\cite{P01} list manual techniques (naive instruction, escape characters, context ignoring, fake completion and their combination) that reach 7.3--16.3\% success on Mistral-7B, against 90.8\% for their optimization-based attack~\cite[p.~8, p.~3]{P01}.
-Optimization attacks~\cite{P01,P02} need white-box gradient access, so we use them only for the taxonomy.
-Jaiswal \emph{et al.}~\cite{P05} add identity manipulation and role override and report that a model with 0\% injection vulnerability can still be 69.2\% vulnerable to jailbreaks~\cite[p.~11]{P05}.
+Shi \emph{et al.}~\cite{P01} list manual techniques: naive instruction, escape characters, context ignoring, fake completion and their combination.
+On Mistral-7B these reach 7.3--16.3\% success, against 90.8\% for their optimization-based attack~\cite[p.~8, p.~3]{P01}.
+Optimization attacks~\cite{P01,P02} need white-box gradient access, so we use these papers only for the taxonomy.
+Jaiswal \emph{et al.}~\cite{P05} add identity manipulation and role override.
+They also report that a model with 0\% injection vulnerability can be 69.2\% vulnerable to jailbreaks~\cite[p.~11]{P05}.
 
 \textbf{Indirect injection through documents.}
-OpenRAG-Soc~\cite{P04} hides instructions in social-web pages (hidden spans, off-screen CSS, alt/ARIA text, zero-width characters) and reports a macro-average success of 24.9\% that falls to 4.7\% with all defenses, at a cost of about 2 points of answerability~\cite[p.~3]{P04}.
-Guler and Aydin~\cite{P13} inject through PDF white text, tiny fonts and metadata in a medical RAG system (2{,}400 trials, mean 47.78\%)~\cite[p.~1, p.~5]{P13}.
+OpenRAG-Soc~\cite{P04} hides instructions in social-web pages through hidden spans, off-screen CSS, alt/ARIA text and zero-width characters.
+Its macro-average success of 24.9\% falls to 4.7\% with all defenses, at a cost of about 2 points of answerability~\cite[p.~3]{P04}.
+Guler and Aydin~\cite{P13} inject through PDF white text, tiny fonts and metadata in a medical RAG system and report a mean of 47.78\% over 2{,}400 trials~\cite[p.~1, p.~5]{P13}.
 
 \textbf{Tool agents.}
-CaMeL~\cite{P08} separates control flow (from the trusted user request) from data flow (from tool outputs) and solves 77\% of AgentDojo tasks with security guarantees, against 84\% undefended~\cite[p.~1]{P08}.
+CaMeL~\cite{P08} takes control flow only from the trusted user request and treats tool outputs as data.
+It solves 77\% of AgentDojo tasks with security guarantees, against 84\% undefended~\cite[p.~1]{P08}.
 
 \textbf{Detectors and cloud deployment.}
-PromptShield~\cite{P03} shows that a 184M DeBERTa detector reaches 43.22\% TPR at 1\% FPR, far below a fine-tuned Llama-3.1-8B (94.80\%)~\cite[p.~9]{P03}.
-Thaqi \emph{et al.}~\cite{P06} place a detector gateway in front of a cloud-hosted model and block above a 0.85 score~\cite[p.~4]{P06}; Chen \emph{et al.}~\cite{P09} study detection in edge-cloud serving.
+In PromptShield~\cite{P03}, a 184M-parameter DeBERTa detector reaches 43.22\% TPR at 1\% FPR, against 94.80\% for a fine-tuned Llama-3.1-8B~\cite[p.~9]{P03}.
+Thaqi \emph{et al.}~\cite{P06} place a detector gateway in front of a cloud-hosted model and block inputs that score above 0.85~\cite[p.~4]{P06}.
+Chen \emph{et al.}~\cite{P09} study detection in edge-cloud serving.
 None of these works compares the same model in a development deployment and a cloud deployment on identical inputs.
 
 \textbf{Statistics.}
@@ -75,40 +92,49 @@ We follow Damastuti \emph{et al.}~\cite{P10}, who report Wilson confidence inter
 
 % ---------------------------------------------------------------------------------------------
 \section{Threat Model}
-The application owner deploys an LLM app as an HTTP service.
-The \emph{victim user} is trusted.
-The \emph{attacker} controls one untrusted channel: the user message (App~A), the content of a document that the knowledge base will index (App~B), or the content of an email or web page that a tool returns (App~C).
-The attacker has no access to model weights, the system prompt or the secret, and cannot change the code.
-Attack goals are (i) leaking a secret from the system prompt, (ii) inserting attacker-chosen content (a marker or a URL) into the answer, and (iii) making the agent call \texttt{send\_email} to an attacker address or \texttt{delete\_file} without the user asking.
-All attacks target our own lab applications and models only.
+The application owner deploys an LLM application as an HTTP service, and the victim user is trusted.
+The attacker controls one untrusted channel.
+In App~A this is the user message; in App~B it is a document that the knowledge base will index; in App~C it is an email or web page that a tool returns.
+The attacker cannot read the model weights, the system prompt or the secret, and cannot change the code.
+The attack goals are:
+(i) leaking a secret from the system prompt;
+(ii) inserting attacker-chosen content (a marker or a URL) into the answer;
+(iii) making the agent call \texttt{send\_email} to an attacker address, or \texttt{delete\_file}, without a user request.
+All attacks targeted our own lab applications and models.
 
 % ---------------------------------------------------------------------------------------------
 \section{System and Methodology}\label{sec:method}
 
 \subsection{Applications}
-All three apps run in one FastAPI service next to an Ollama model server; the request body selects the app, model and defense (a lab-only control).
+All three applications run in one FastAPI service next to an Ollama model server.
+The request body selects the application, model and defense; this is a lab-only control.
 \begin{itemize}
-\item \textbf{App A, support chatbot:} a help-desk assistant whose system prompt contains a secret staff discount code (random per trial) and rules not to reveal it.
-\item \textbf{App B, RAG Q\&A:} answers HR/policy questions from 20 HTML and PDF documents using BM25 retrieval (top-3). Ingestion is deliberately naive, as in quickly built apps: the HTML extractor keeps hidden elements, alt/ARIA text and the PDF extractor keeps all text and metadata. One poisoned document per trial is written to be retrieved for the trial's question.
-\item \textbf{App C, tool agent:} an email/file assistant with mock tools \texttt{read\_inbox}, \texttt{fetch\_page}, \texttt{send\_email}, \texttt{list\_files} and \texttt{delete\_file} (no real side effects), using the backend's native tool calling and at most 4 steps.
+\item \textbf{App A, support chatbot:} a help-desk assistant. Its system prompt holds a secret staff discount code, random per trial, and rules not to reveal it.
+\item \textbf{App B, RAG Q\&A:} answers HR and policy questions from 20 HTML and PDF documents with BM25 retrieval (top-3). Ingestion is naive on purpose, as in quickly built applications. The HTML extractor keeps hidden elements and alt/ARIA text, and the PDF extractor keeps all text and metadata. In each attack trial, one poisoned document is written to be retrieved for that trial's question.
+\item \textbf{App C, tool agent:} an email and file assistant with mock tools (\texttt{read\_inbox}, \texttt{fetch\_page}, \texttt{send\_email}, \texttt{list\_files}, \texttt{delete\_file}) that have no real side effects. It uses the backend's native tool calling, with at most 4 steps.
 \end{itemize}
 
 \subsection{Models and sampling}
-We use four open-weight models served by Ollama 0.40.16: qwen3-1.7b (thinking disabled with \texttt{/no\_think}), llama3.2-3b, gemma3-1b and qwen3-4b-instruct (\texttt{qwen3:4b-instruct-2507-q4\_K\_M}).
+Ollama 0.40.16 serves four open-weight models: qwen3-1.7b (thinking disabled with \texttt{/no\_think}), llama3.2-3b, gemma3-1b and qwen3-4b-instruct (\texttt{qwen3:4b-instruct-2507-q4\_K\_M}).
 qwen3:1.7b, gemma3:1b and llama3.2:3b are also evaluated in~\cite{P05}.
-gemma3-1b has no tool support in Ollama and is used for Apps A and B only.
-All runs use temperature~0, a fixed seed per trial and at most 300 output tokens; variation comes from payload wording, not from sampling.
-The bare Ollama tag \texttt{qwen3:4b} now resolves to a thinking-only checkpoint that ignored \texttt{/no\_think}; its hidden reasoning used up the token budget and 68\% of its outputs were empty, so that run was excluded and replaced by the pinned instruct tag.
+gemma3-1b has no tool support in Ollama, so it is used for Apps A and B only.
+All runs use temperature~0, a fixed seed per trial and at most 300 output tokens.
+Variation therefore comes from payload wording, not from sampling.
+The bare Ollama tag \texttt{qwen3:4b} now resolves to a thinking-only checkpoint that ignored \texttt{/no\_think}.
+Its hidden reasoning used up the token budget and 68\% of its outputs were empty.
+We excluded that run and replaced it with the pinned instruct tag.
 Model digests are logged with every run.
 
 \subsection{Attack matrix}
-We separate \emph{what} a payload says (technique) from \emph{where} it is hidden (carrier), so that every carrier can deliver every technique.
+We separate \emph{what} a payload says (technique) from \emph{where} it is hidden (carrier), so every carrier can deliver every technique.
 Table~\ref{tab:taxonomy} lists both.
-Each technique has six wordings and each app five attacker-goal phrasings, giving 30 variants per cell.
+Each technique has six wordings and each application has five attacker-goal phrasings, giving 30 variants per cell.
 Our three hybrids combine only paper-defined parts:
-H1 puts the strongest single technique in App~B (chosen from the baseline before the H1 run: T4) inside the stealthiest carriers C2 and C5;
-H2 splits a payload across channels (a trigger in the user message, the instruction in the carrier);
-H3 hides a zero-width-split payload inside a hidden HTML element (C2+C4).
+\begin{itemize}
+\item H1 places the strongest single technique in App~B inside the stealthiest carriers, C2 and C5. The technique (T4) was chosen from the baseline before the H1 run.
+\item H2 splits a payload across channels: a trigger in the user message and the instruction in the carrier.
+\item H3 hides a zero-width-split payload inside a hidden HTML element (C2+C4).
+\end{itemize}
 
 \begin{table}[t]
 \caption{Techniques (what the payload says) and carriers (where it is hidden). Source: paper and page.}
@@ -140,34 +166,61 @@ C9 & Web page from \texttt{fetch\_page} (App C) & \cite[p.~1]{P08} \\
 \end{tabular}
 \end{table}
 
-The resulting cells are T1--T7 and H2 in App~A (8 cells), T1--T7 in C1, T7 in C2--C7, H1 in C2 and C5 and H3 (16 cells) in App~B, and T1--T7 in C8, T7 in C9 and H2 (9 cells) in App~C.
-With 30 clean utility tasks per app this gives 270, 510 and 300 trials per model and defense setting.
+App~A has 8 cells (T1--T7 and H2).
+App~B has 16 cells: T1--T7 in C1, T7 in C2--C7, H1 in C2 and C5, and H3.
+App~C has 9 cells: T1--T7 in C8, T7 in C9 and H2.
+With 30 clean utility tasks per application, this gives 270, 510 and 300 trials per model and defense setting.
 
 \subsection{Success checks and statistics}
-Success is decided by deterministic rules with a random canary, marker or attacker address generated per trial~\cite[p.~5]{P13}:
-App~A: the secret appears in the output, also after normalization, reversal, ROT13 or base64 decoding;
-App~B: the marker or the attacker URL appears in the answer;
-App~C: an executed \texttt{send\_email} to the attacker address or an unrequested \texttt{delete\_file}.
+Deterministic rules decide success, using a random canary, marker or attacker address generated for each trial~\cite[p.~5]{P13}.
+\begin{itemize}
+\item App~A: the secret appears in the output, also after normalization, reversal, ROT13 or base64 decoding.
+\item App~B: the marker or the attacker URL appears in the answer.
+\item App~C: the agent executes \texttt{send\_email} to the attacker address or an unrequested \texttt{delete\_file}.
+\end{itemize}
 We do not use an LLM judge, because weak judges approve up to 49.7\% unsafe outputs~\cite[p.~11]{P05}.
-A RAG trial whose poisoned document was not retrieved and that did not succeed is marked invalid and excluded from the denominator; in practice every poisoned document was retrieved.
+A RAG trial is invalid, and excluded from the denominator, if its poisoned document was not retrieved and the attack failed.
+In practice every poisoned document was retrieved.
 Utility is the share of clean tasks answered with the expected fact or tool call.
-We report attack success rate (ASR) with Wilson 95\% intervals and use exact McNemar tests for paired comparisons on the same trial ids~\cite[p.~4]{P10}.
+We report the attack success rate (ASR) with Wilson 95\% intervals and use exact McNemar tests for paired comparisons on the same trial ids~\cite[p.~4]{P10}.
 
 \subsection{Deployments}
-\textbf{Development (Kaggle).} The harness, apps and Ollama run in one Kaggle notebook (2$\times$ NVIDIA T4) and the apps are called in process.
-\textbf{Cloud (AWS).} The same Docker Compose stack (pinned Ollama image 0.40.16, same model digests) runs on an EC2 \texttt{m7i-flex.large} instance (2 vCPU, 8\,GB RAM, no GPU; ap-southeast-2) behind an API key and a security group that admits only the tester's IP.
+\textbf{Development (Kaggle).}
+The harness, the applications and Ollama run in one Kaggle notebook with 2$\times$ NVIDIA T4, and the applications are called in process.
+
+\textbf{Cloud (AWS).}
+The same Docker Compose stack runs on an EC2 \texttt{m7i-flex.large} instance (2 vCPU, 8\,GB RAM, no GPU; ap-southeast-2), with the Ollama image pinned to 0.40.16 and the same model digests.
+An API key and a security group that admits only the tester's IP protect it.
 The harness runs on a separate machine and attacks the public HTTP endpoint as a black box, with the same trial ids, seeds and payloads as on Kaggle.
-The instance type was forced by the AWS Free plan, which does not allow GPU instances; this choice kept the whole cloud stage inside the free credits.
+The AWS Free plan does not allow GPU instances, which forced this instance type; it also kept the whole cloud stage inside the free credits.
 
 % ---------------------------------------------------------------------------------------------
 \section{Defenses}\label{sec:defenses}
-\textbf{D1, detector}~\cite{protectai}: the ProtectAI DeBERTa-v3 prompt-injection classifier scores the user message, each retrieved chunk and each tool output (1{,}500-character windows) on CPU; scores above 0.85~\cite[p.~4]{P06} block the input (chatbot) or drop the chunk/tool output.
-\textbf{D2, sanitize}~\cite[p.~3]{P04}: Unicode NFKC normalization that removes format characters (zero-width, bidi controls), then visible-text extraction that drops hidden HTML elements, alt/ARIA text, PDF white or sub-1\,pt text and PDF metadata.
-\textbf{D3, spotlighting and hardening}~\cite[p.~10]{P05}: untrusted text is wrapped in \texttt{<UNTRUSTED\_DATA>} tags and the system prompt states that such data is never an instruction; in App~A, where the only input is the user's own message, only the hardening part applies.
-\textbf{D4, tool policy} (simplified CaMeL~\cite[p.~1, p.~4]{P08}): the recipient of \texttt{send\_email} and the path of \texttt{delete\_file} must appear in the user's own request.
-\textbf{Layered [ours]}: each channel gets the defense that fits it: user message $\to$ D1 + hardening; documents $\to$ D2, then D1 on each chunk, then D3; tool outputs $\to$ D3 + D4; final answer $\to$ an output guard that withholds the secret (raw or normalized) and URLs outside an allow-list.
-The guard is deliberately weaker than the success checker (no base64/ROT13), so the checker is not reused as the defense.
-A self-check defense~\cite[p.~10]{P05} was not built (time; it needs a second LLM call and depends on judge quality).
+\textbf{D1, detector}~\cite{protectai}.
+The ProtectAI DeBERTa-v3 prompt-injection classifier runs on CPU and scores the user message, each retrieved chunk and each tool output in 1{,}500-character windows.
+A score above 0.85~\cite[p.~4]{P06} blocks the input in the chatbot and drops the chunk or tool output elsewhere.
+
+\textbf{D2, sanitize}~\cite[p.~3]{P04}.
+Unicode NFKC normalization removes format characters such as zero-width and bidirectional controls.
+Visible-text extraction then drops hidden HTML elements, alt/ARIA text, PDF white or sub-1\,pt text and PDF metadata.
+
+\textbf{D3, spotlighting and hardening}~\cite[p.~10]{P05}.
+Untrusted text is wrapped in \texttt{<UNTRUSTED\_DATA>} tags, and the system prompt states that such data is never an instruction.
+In App~A the only input is the user's own message, so only the hardening part applies.
+
+\textbf{D4, tool policy}, a simplified CaMeL rule~\cite[p.~1, p.~4]{P08}.
+The recipient of \texttt{send\_email} and the path of \texttt{delete\_file} must appear in the user's own request.
+
+\textbf{Layered defense (ours).}
+Each channel receives the defense that fits it:
+\begin{itemize}
+\item user message: D1 and hardening;
+\item documents: D2, then D1 on each chunk, then D3;
+\item tool outputs: D3 and D4;
+\item final answer: an output guard that withholds the secret (raw or normalized) and any URL outside an allow-list.
+\end{itemize}
+The guard is deliberately weaker than the success checker (no base64 or ROT13 decoding), so the checker is not reused as the defense.
+We did not build a self-check defense~\cite[p.~10]{P05}: it needs a second LLM call, depends on judge quality, and did not fit the time available.
 
 % ---------------------------------------------------------------------------------------------
 \section{Results: Attacks Without Defense}\label{sec:baseline}
@@ -211,28 +264,37 @@ H2 split (ours) & 14 & -- & 7 \\
 \end{table}
 
 \textbf{Direct and indirect robustness are different properties.}
-Table~\ref{tab:baseline-model} shows that qwen3-1.7b and gemma3-1b leak the secret in 77--83\% of direct attacks, while llama3.2-3b (1.7\%) and qwen3-4b-instruct (0/240) almost never do.
-The ranking reverses for injected data: qwen3-4b-instruct is the most vulnerable model in both the RAG app (67.1\%) and the agent (43.7\%), and llama3.2-3b is more vulnerable than qwen3-1.7b in RAG (53.1\% vs 41.9\%).
+In Table~\ref{tab:baseline-model}, qwen3-1.7b and gemma3-1b leak the secret in 77--83\% of direct attacks.
+llama3.2-3b (1.7\%) and qwen3-4b-instruct (0/240) almost never do.
+The ranking reverses for injected data.
+qwen3-4b-instruct is the most vulnerable model in both the RAG app (67.1\%) and the agent (43.7\%).
+llama3.2-3b is more vulnerable than qwen3-1.7b in RAG (53.1\% vs 41.9\%).
 gemma3-1b, the weakest model against direct injection, is the least affected by documents (15.8\%).
-[Inference] Models that follow instructions more reliably also follow instructions that arrive inside data; refusing a direct ``reveal the code'' request does not protect the data channels.
-This extends the observation of~\cite[p.~11]{P05} (injection and jailbreak robustness differ) to direct versus indirect injection.
+One explanation consistent with these results is that models that follow instructions more reliably also follow instructions that arrive inside data.
+Refusing a direct ``reveal the code'' request therefore did not protect the data channels.
+This extends the observation of~\cite[p.~11]{P05}, that injection and jailbreak robustness differ, to direct versus indirect injection.
 
 \textbf{Techniques.}
-In the chatbot all seven techniques perform similarly (40--47\%, Table~\ref{tab:baseline-tech}), because the outcome is decided mostly by the model.
-In documents, escape characters and fake delimiters (T4, 63\%) and the combined attack (T7, 55\%) are strongest; in emails, fake completion (T3, 46\%) is strongest, while a naive instruction (T1, 4\%) and an authority claim (T6, 2\%) almost never trigger a tool call.
-Injected web pages (T7 in C9, 46\%) work better than injected emails (T7 in C8, 38\%).
-The cross-channel split H2 is weak (14\% and 7\%).
+In the chatbot the seven techniques perform similarly (40--47\%, Table~\ref{tab:baseline-tech}), which suggests that the model, more than the wording, decides the outcome.
+In documents, escape characters and fake delimiters (T4, 63\%) and the combined attack (T7, 55\%) are the strongest.
+In emails, fake completion (T3, 46\%) is the strongest.
+A naive instruction (T1, 4\%) and an authority claim (T6, 2\%) rarely trigger a tool call.
+Injected web pages (T7 in C9, 46\%) succeed more often than injected emails (T7 in C8, 38\%).
+The cross-channel split H2 is weak in both applications where it applies (14\% and 7\%).
 
 \textbf{Carriers.}
-With the combined technique T7, hidden HTML (C2, 52\%) and alt/ARIA text (C3, 54\%) are as effective as visible text (C1, 55\%), because the naive extractor keeps them, as in~\cite[p.~3]{P04}.
-PDF carriers are somewhat weaker (white text 39\%, 0.1\,pt text 42\%, metadata 48\%); for comparison,~\cite[p.~5]{P13} report 43--51\% for the same three PDF vectors on other models (not comparable: different models, prompts and checker).
-Our hybrid H1 (T4 hidden in C2) is the strongest RAG cell overall (67\%), so hiding the payload costs the attacker nothing.
-Zero-width splitting (C4) mostly defeats itself: 7\% pooled (1/90 on the three smaller models, 23\% on qwen3-4b-instruct), although the poisoned document was retrieved in every trial.
-[Inference] The invisible characters break the payload into unusual tokens that small models cannot read.
+With the combined technique T7, hidden HTML (C2, 52\%) and alt/ARIA text (C3, 54\%) are about as effective as visible text (C1, 55\%), because the naive extractor keeps them, as in~\cite[p.~3]{P04}.
+PDF carriers are 7--16 points lower than visible text: white text 39\%, 0.1\,pt text 42\% and metadata 48\%.
+For the same three PDF vectors,~\cite[p.~5]{P13} report 43--51\% on other models; the numbers are not comparable because models, prompts and checkers differ.
+Our hybrid H1 (T4 hidden in C2) is the strongest RAG cell (67\%), so hiding the payload did not reduce its effect relative to T4 in visible text (63\%).
+Zero-width splitting (C4) mostly defeats itself: it reaches 7\% pooled, with 1/90 on the three smaller models and 23\% on qwen3-4b-instruct.
+The poisoned document was retrieved in every one of these trials.
+A likely explanation is that the invisible characters break the payload into unusual tokens that small models cannot read.
 
 \textbf{Utility and quality checks.}
-Without defense, clean-task utility is 87--100\% for every model and app.
-Of 19{,}020 Kaggle trials, 6 were invalid (HTTP~500 from the model server) and 25 ended with an agent error (step limit or server error); qwen3-1.7b produced about 4\% empty single-call answers, which count as failed attacks.
+Without defense, clean-task utility is 87--100\% for every model and application.
+Of 19{,}020 Kaggle trials, 6 were invalid (HTTP~500 from the model server) and 25 ended with an agent error (step limit or server error).
+qwen3-1.7b produced about 4\% empty single-call answers, which count as failed attacks.
 
 % ---------------------------------------------------------------------------------------------
 \section{Results: Defenses}\label{sec:defense}
@@ -285,71 +347,86 @@ H3@C2+C4 (ours) & 5 & 1 & 0 & 2 & 0 \\
 \end{tabular}
 \end{table}
 
-\textbf{The layered defense is best in every app at no utility cost.}
-Table~\ref{tab:defense} shows pooled ASR falling from 40\% to 0\% (0/960) in the chatbot, from 44\% to 7\% (135/1{,}920) in RAG and from 24\% to 0\% (0/807) in the agent.
-Every per-model reduction is significant (exact McNemar $p<10^{-7}$) except where the model was already near 0 in the chatbot.
-No clean task was blocked by D1 or by the layered defense in any app, and pooled utility stays at 93--100\%; the largest per-model drop is qwen3-1.7b in the agent with D3 or layered (27/30 to 25/30).
-For comparison, OpenRAG-Soc reports 24.9\% to 4.7\% with all defenses~\cite[p.~3]{P04} (not comparable: different models, data and checker).
+\textbf{The layered defense gave the lowest ASR in every app, without utility loss.}
+In Table~\ref{tab:defense}, pooled ASR falls from 40\% to 0\% (0/960) in the chatbot, from 44\% to 7\% (135/1{,}920) in RAG and from 24\% to 0\% (0/807) in the agent.
+Every per-model reduction is significant (exact McNemar $p<10^{-7}$), except in the chatbot for the two models that were already near 0.
+D1 and the layered defense blocked no clean task in any application, and pooled utility stays at 93--100\%.
+The largest per-model drop is qwen3-1.7b in the agent with D3 or layered (27/30 to 25/30).
+OpenRAG-Soc reports a reduction from 24.9\% to 4.7\% with all defenses~\cite[p.~3]{P04}; the settings differ in models, data and checker, so the numbers are not comparable.
 
 \textbf{D1 is strong on direct injection and weaker on documents.}
-The detector removes almost all chatbot attacks (40.4\% to 1.8\%) and most obvious override payloads in documents (T7@C1 55\% to 4\%), but misses the naive instruction (T1@C1 50\% to 48\%) and fake completion (T3@C1 50\% to 44\%; T3 in emails 46\% to 46\%).
-[Inference] These payloads contain no override wording, so inside a chunk of normal text they score below the 0.85 threshold.
-This matches the low TPR of DeBERTa-size detectors at low FPR in~\cite[p.~9]{P03}.
+The detector removes most chatbot attacks (40.4\% to 1.8\%) and most override payloads in documents (T7@C1, 55\% to 4\%).
+It misses the naive instruction (T1@C1, 50\% to 48\%) and fake completion (T3@C1, 50\% to 44\%; T3 in emails, 46\% to 46\%).
+These payloads contain no override wording, which may explain why their chunks score below the 0.85 threshold.
+This is consistent with the low TPR of DeBERTa-size detectors at low FPR reported in~\cite[p.~9]{P03}.
 
-\textbf{D2 removes every hidden carrier, and alone it repairs zero-width payloads.}
+\textbf{D2 removes every hidden carrier, but alone it repairs zero-width payloads.}
 Sanitization drives all hidden carriers (C2, C3, C5--C7, H1, H3) to 0\% and leaves visible-text attacks unchanged (Table~\ref{tab:rag-cells}).
-Used alone, however, it raises T7@C4 from 7\% to 55\%: Unicode normalization deletes the zero-width characters that were breaking the payload's tokens, and hands the model a clean instruction.
-In the layered defense the detector runs after normalization and the cell falls to 4\%.
-Normalizing defenses should therefore always be followed by detection, never be the last layer.
+Used alone, it raises T7@C4 from 7\% to 55\%.
+Unicode normalization deletes the zero-width characters that were breaking the payload's tokens, and the model then receives a clean instruction.
+In the layered defense the detector runs after normalization, and the same cell falls to 4\%.
+In our setting, normalization helped only when detection followed it; we therefore recommend that a normalizing defense never be the last layer.
 
-\textbf{D3 helps data channels, not direct injection.}
-Spotlighting lowers ASR in RAG (44\% to 27\%) and in the agent (24\% to 6\%), but hardening alone does not help the chatbot (40\% to 39\%) and for llama3.2-3b it increases leaks (1.7\% to 7.5\%, McNemar $p=0.0005$), consistent with the inconsistent effect of system-prompt defenses in~\cite[p.~10]{P05}.
+\textbf{D3 helps the data channels but not direct injection.}
+Spotlighting lowers ASR in RAG (44\% to 27\%) and in the agent (24\% to 6\%).
+Hardening alone does not help the chatbot (40\% to 39\%).
+For llama3.2-3b it increases leaks (1.7\% to 7.5\%, McNemar $p=0.0005$), which is consistent with the inconsistent effect of system-prompt defenses in~\cite[p.~10]{P05}.
 
-\textbf{D4 blocks every exfiltration.}
-The tool policy prevents all attacker tool calls (0/810) with unchanged utility (96\% pooled vs 94\% without defense), in line with the design argument of CaMeL~\cite[p.~1]{P08}; our rule is simplified and covers only recipients and file paths.
+\textbf{D4 blocked all exfiltration attempts.}
+The tool policy prevented every attacker tool call (0/810) with unchanged utility (96\% pooled vs 94\% without defense).
+This agrees with the design argument of CaMeL~\cite[p.~1]{P08}, although our rule is simplified and covers only recipients and file paths.
 
 \textbf{Residual risk.}
-Visible-text injection in documents remains: under the layered defense T1@C1 (36\%), T3@C1 (22\%) and T4@C1 (21\%) still succeed, because no layer removes visible instructions that the detector scores below its threshold.
-We did not lower the threshold, since that would tune the defense on the test set.
+Visible-text injection in documents remains under the layered defense: T1@C1 (36\%), T3@C1 (22\%) and T4@C1 (21\%) still succeed.
+No layer removes visible instructions that the detector scores below its threshold.
+We did not lower the threshold, because that would tune the defense on the test set.
 
 \textbf{Latency.}
-The CPU detector adds about 0.6\,s per RAG trial (median 1.10\,s vs 0.51\,s); blocked chatbot inputs skip the model, so the layered chatbot is faster than no defense; D2, D3 and D4 add no measurable time.
+The CPU detector adds about 0.6\,s per RAG trial (median 1.10\,s vs 0.51\,s).
+Blocked chatbot inputs skip the model, so the layered chatbot is faster than the undefended one.
+D2, D3 and D4 add no measurable time.
 
 % ---------------------------------------------------------------------------------------------
 \section{Results: Development vs. Cloud Deployment}\label{sec:cloud}
-We repeated a subset of the matrix against the AWS-hosted service with the same trial ids: gemma3-1b in Apps A and B and llama3.2-3b in App C, each without defense and with the layered defense (10 variants per cell, 5 in App C, all 30 clean tasks) \pending{final cloud subset and trial count}.
-For each pair of trials we compare the success outcome (exact McNemar), whether the output text is identical, and the median latency inside the server and as seen by the remote harness.
+We repeated a subset of the matrix against the AWS-hosted service with the same trial ids.
+The subset covers gemma3-1b in Apps A and B and llama3.2-3b in App C, each without defense and with the layered defense, using 10 variants per cell (5 in App C) and all 30 clean tasks \pending{final cloud subset and trial count}.
+For each pair of trials we compare the success outcome (exact McNemar test), whether the output text is identical, and the median latency inside the server and at the remote harness.
 
 \pending{Table: per model/app/defense -- paired n, Kaggle ASR, AWS ASR, McNemar p, identical outputs, median server latency Kaggle vs AWS, wall latency.}
 
-Preliminary (first 25 chatbot trials, gemma3-1b, no defense): 25/25 trials had the same success outcome on both deployments and 21/25 had word-for-word identical outputs; median time per trial was 6.9\,s inside the CPU server and 7.2\,s at the remote harness, against 0.4\,s on the Kaggle GPU \pending{replace with final numbers}.
-[Inference] At temperature~0 the deployment changes the wording of some answers (CPU and GPU arithmetic differ slightly) but not whether an attack succeeds; the cost of the cloud deployment is latency, not security.
+Preliminary results cover the first 25 chatbot trials of gemma3-1b without defense.
+All 25 had the same success outcome on both deployments, and 21 had word-for-word identical outputs.
+The median time per trial was 6.9\,s inside the CPU server and 7.2\,s at the remote harness, against 0.4\,s on the Kaggle GPU \pending{replace with final numbers}.
+These early pairs suggest that, at temperature~0, the deployment changes the wording of some answers (CPU and GPU arithmetic differ slightly) without changing whether an attack succeeds.
 
 % ---------------------------------------------------------------------------------------------
 \section{Discussion and Limitations}
 \textbf{Implications.}
-Choosing a model that refuses direct requests is not a defense for RAG or agent applications; the data channels need their own controls.
-The cheapest effective controls were structural: removing invisible content (D2) and restricting what tool outputs can cause (D4).
-Classifier-based detection is useful but must see normalized text and still misses payloads without override wording.
+In our results, choosing a model that refuses direct requests did not protect RAG or agent applications; the data channels needed their own controls.
+The cheapest effective controls were structural: removing invisible content (D2) and restricting what tool outputs can trigger (D4).
+Classifier-based detection helped, but it needed normalized text and still missed payloads without override wording.
 
 \textbf{Limitations.}
-(i) Small models only (1--4B, quantized); larger models may behave differently.
-(ii) The attacks are fixed templates, not adaptive or optimization-based attacks~\cite{P01,P02}.
-(iii) The cloud host is CPU-only because the AWS Free plan excludes GPU instances, so latency differences mix hardware and deployment; we report them separately from security outcomes.
-(iv) The cloud subset is smaller than the Kaggle matrix because of CPU speed and the deadline.
-(v) The endpoint used HTTP restricted to one IP with an API key, not HTTPS, and no API gateway or managed logging.
-(vi) D4 is a simplified data-flow rule, not the full CaMeL interpreter, and the self-check defense was not evaluated.
-(vii) Success checks count only executed tool calls and exact markers; a model that merely writes the attacker's address in text is not counted as a success.
+\begin{itemize}
+\item We tested only small quantized models (1--4B parameters); larger models may behave differently.
+\item The attacks are fixed templates, not adaptive or optimization-based attacks~\cite{P01,P02}.
+\item The cloud host is CPU-only because the AWS Free plan excludes GPU instances. Latency differences therefore mix hardware and deployment; we report them separately from security outcomes.
+\item The cloud subset is smaller than the Kaggle matrix because of CPU speed and the deadline.
+\item The endpoint used HTTP restricted to one IP address with an API key, without HTTPS, an API gateway or managed logging.
+\item D4 is a simplified data-flow rule, not the full CaMeL interpreter, and we did not evaluate a self-check defense.
+\item The checks count only executed tool calls and exact markers. A model that only writes the attacker's address in its text is not counted as a success.
+\end{itemize}
 
 \textbf{Ethics.}
-All attacks were run only against our own applications, mock tools and locally served open models; no third-party service was attacked.
+We ran all attacks only against our own applications, mock tools and locally served open models; no third-party service was attacked.
 
 % ---------------------------------------------------------------------------------------------
 \section{Conclusion}
-On four small open models, robustness to direct prompt injection did not predict robustness to injection through documents or tool outputs; the models that refused direct requests were the easiest to hijack through data.
-A channel-aware layered defense built from paper-defined parts reduced attack success to 0\%, 7\% and 0\% in the chatbot, RAG and agent apps without hurting utility, provided that normalization precedes detection.
+On four small open models, robustness to direct prompt injection did not predict robustness to injection through documents or tool outputs.
+The two models that refused direct requests were the easiest to hijack through retrieved documents.
+A channel-aware layered defense built from paper-defined parts reduced attack success to 0\%, 7\% and 0\% in the chatbot, RAG and agent applications without reducing utility, provided that normalization preceded detection.
 \pending{one sentence on the cloud comparison.}
-Future work: adaptive attacks, larger models, a GPU cloud host and a second detector for visible-text injection.
+Future work includes adaptive attacks, larger models, a GPU cloud host and a second detector for visible-text injection.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
