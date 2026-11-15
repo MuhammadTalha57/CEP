@@ -3,6 +3,7 @@
   python -m llmsec.harness.report results --out reports/results_summary.md
   python -m llmsec.harness.report results --compare-defense none layered      # paired McNemar per cell
   python -m llmsec.harness.report results --compare-env local aws             # same model, same trials
+  python -m llmsec.harness.report results/kaggle --defense-table              # per app x defense, pooled cells
 """
 from __future__ import annotations
 
@@ -83,6 +84,40 @@ def compare_markdown(recs, field: str, a: str, b: str) -> str:
     return "\n".join(lines)
 
 
+def defense_rows(recs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """One row per (model, app, defense): ASR over all attack trials, utility over clean trials, latency,
+    and an exact McNemar test against `none` paired on trial id (P10 p4). Invalid trials are left out."""
+    groups: dict[tuple, list[dict[str, Any]]] = defaultdict(list)
+    for r in recs:
+        groups[(r["model"], r["app"], r["defense"])].append(r)
+    rows = []
+    for (model, app, defense), rs in sorted(groups.items()):
+        valid = [r for r in rs if r["eval"]["valid"]]
+        att = {r["trial_id"]: r["eval"]["success"] for r in valid if r["kind"] == "attack"}
+        cln = [r["eval"]["success"] for r in valid if r["kind"] == "clean"]
+        base = {r["trial_id"]: r["eval"]["success"] for r in groups.get((model, app, "none"), [])
+                if r["eval"]["valid"] and r["kind"] == "attack"}
+        cmp = paired(base, att) if defense != "none" else None
+        rows.append({"model": model, "app": app, "defense": defense, "asr_k": sum(att.values()), "asr_n": len(att),
+                     "util_k": sum(cln), "util_n": len(cln), "invalid": len(rs) - len(valid),
+                     "lat_mean_s": mean(r["wall_ms"] for r in rs) / 1000,
+                     "p_vs_none": cmp["p_mcnemar"] if cmp else float("nan")})
+    return rows
+
+
+def defense_markdown(recs: list[dict[str, Any]]) -> str:
+    lines = ["| model | app | defense | ASR k/n | ASR % [95% CI] | utility % | invalid | mean s | McNemar p vs none |",
+             "|---|---|---|---|---|---|---|---|---|"]
+    for r in defense_rows(recs):
+        lo, hi = wilson(r["asr_k"], r["asr_n"])
+        util = r["util_k"] / r["util_n"] if r["util_n"] else float("nan")
+        p = "–" if r["p_vs_none"] != r["p_vs_none"] else f"{r['p_vs_none']:.2g}"
+        lines.append(f"| {r['model']} | {r['app']} | {r['defense']} | {r['asr_k']}/{r['asr_n']} | "
+                     f"{_fmt(r['asr_k'] / r['asr_n'] if r['asr_n'] else float('nan'))} [{_fmt(lo)}–{_fmt(hi)}] | "
+                     f"{_fmt(util)} | {r['invalid']} | {r['lat_mean_s']:.2f} | {p} |")
+    return "\n".join(lines)
+
+
 def _identical_outputs(recs, a: str, b: str) -> tuple[int, int]:
     by: dict[tuple, dict[str, str]] = defaultdict(dict)
     for r in recs:
@@ -98,10 +133,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out")
     ap.add_argument("--compare-defense", nargs=2, metavar=("A", "B"))
     ap.add_argument("--compare-env", nargs=2, metavar=("A", "B"))
+    ap.add_argument("--defense-table", action="store_true", help="per model x app x defense, cells pooled")
     a = ap.parse_args(argv)
     recs = load(Path(p) for p in a.paths)
     if a.compare_defense:
         md = compare_markdown(recs, "defense", *a.compare_defense)
+    elif a.defense_table:
+        md = defense_markdown(recs)
     elif a.compare_env:
         md = compare_markdown(recs, "env", *a.compare_env)
     else:

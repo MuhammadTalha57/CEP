@@ -126,3 +126,16 @@ def test_qwen3_4b_is_pinned_non_thinking():
     specs = load_specs()
     assert "qwen3-4b" not in specs  # old id pointed to the thinking-only tag
     assert specs["qwen3-4b-instruct"].model == "qwen3:4b-instruct-2507-q4_K_M"
+
+
+def test_defense_rows_pool_cells_and_pair_with_none():
+    def rec(defense, tid, kind, success):
+        return {"model": "m", "app": "rag", "defense": defense, "trial_id": tid, "kind": kind, "wall_ms": 1000.0,
+                "eval": {"valid": True, "success": success}}
+    recs = [rec("none", f"a{i}", "attack", True) for i in range(10)] + [rec("none", "u", "clean", True)]
+    recs += [rec("d1", f"a{i}", "attack", i < 2) for i in range(10)] + [rec("d1", "u", "clean", False)]
+    rows = {r["defense"]: r for r in report.defense_rows(recs)}
+    assert (rows["none"]["asr_k"], rows["none"]["asr_n"]) == (10, 10)
+    assert (rows["d1"]["asr_k"], rows["d1"]["util_k"], rows["d1"]["util_n"]) == (2, 0, 1)
+    assert abs(rows["d1"]["p_vs_none"] - mcnemar_exact(8, 0)) < 1e-12
+    assert "| m | rag | d1 | 2/10 |" in report.defense_markdown(recs)
