@@ -158,7 +158,7 @@ ASR = attack success over all attack trials of the app. Utility = clean tasks an
    - Every per-model reduction is significant (McNemar p < 1e-7), except where the model was already near 0 (llama3.2-3b chatbot, qwen3-4b-instruct chatbot).
 2. **D1 (detector) is the strongest single defense against direct injection** (App A: 2.9–4.2% left on qwen3-1.7b and gemma3-1b). It is weaker for documents.
    - T1@C1, T3@C1 and T4@C1 still succeed at 48%, 44% and 22% in RAG.
-   - Yet T1 in the chatbot is caught 92% of the time. [INFERENCE] When the payload is surrounded by normal document text, the chunk's score drops below the 0.85 threshold.
+   - Yet T1 in the chatbot drops from 44% to 8%. [INFERENCE] T1 (naive instruction) and T3 (fake completion) contain no override wording, so inside a document chunk surrounded by normal text they score below the 0.85 threshold.
    - In the agent, D1 misses T3 (fake completion) completely (46% → 46%).
 3. **D2 (sanitize) removes every hidden carrier and nothing else.**
    - C2, C3, C5, C6, C7 and H1/H3 drop to **0%**.
