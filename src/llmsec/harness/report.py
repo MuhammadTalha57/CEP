@@ -62,25 +62,55 @@ def summary_markdown(recs: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def _success_map(recs, **where) -> dict[tuple, dict[str, bool]]:
+def _other(field: str) -> str:
+    """Comparing envs keeps the defense fixed and vice versa (otherwise trials of different defenses would pair)."""
+    return "defense" if field == "env" else "env"
+
+
+def _success_map(recs, field: str, value: str) -> dict[tuple, dict[str, bool]]:
     out: dict[tuple, dict[str, bool]] = defaultdict(dict)
     for r in recs:
-        if all(r[k] == v for k, v in where.items()) and r["eval"]["valid"]:
-            out[(r["model"], r["app"], r["cell"])][r["trial_id"]] = r["eval"]["success"]
+        if r[field] == value and r["eval"]["valid"]:
+            out[(r["model"], r["app"], r[_other(field)], r["cell"])][r["trial_id"]] = r["eval"]["success"]
     return out
 
 
 def compare_markdown(recs, field: str, a: str, b: str) -> str:
-    ma, mb = _success_map(recs, **{field: a}), _success_map(recs, **{field: b})
-    lines = [f"| model | app | cell | n paired | {a} % | {b} % | only {a} | only {b} | McNemar p |",
-             "|---|---|---|---|---|---|---|---|---|"]
+    ma, mb = _success_map(recs, field, a), _success_map(recs, field, b)
+    lines = [f"| model | app | {_other(field)} | cell | n paired | {a} % | {b} % | only {a} | only {b} | McNemar p |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
     for key in sorted(set(ma) & set(mb)):
         s = paired(ma[key], mb[key])
-        lines.append(f"| {key[0]} | {key[1]} | {key[2]} | {s['n']} | {_fmt(s['rate_a'])} | {_fmt(s['rate_b'])} | "
-                     f"{s['only_a']} | {s['only_b']} | {s['p_mcnemar']:.3g} |")
+        lines.append(f"| {key[0]} | {key[1]} | {key[2]} | {key[3]} | {s['n']} | {_fmt(s['rate_a'])} | "
+                     f"{_fmt(s['rate_b'])} | {s['only_a']} | {s['only_b']} | {s['p_mcnemar']:.3g} |")
     if field == "env":
         same = _identical_outputs(recs, a, b)
         lines.append(f"\nIdentical outputs {a} vs {b}: {same[0]}/{same[1]} paired trials.")
+        lines.append("\n" + latency_markdown(recs, a, b))
+    return "\n".join(lines)
+
+
+def latency_markdown(recs, a: str, b: str) -> str:
+    """Median latency on the paired trials only. server = time inside the app server (same meaning in both envs);
+    wall = time seen by the harness (adds the network for an HTTP target)."""
+    by: dict[tuple, dict[str, dict[str, Any]]] = defaultdict(dict)
+    for r in recs:
+        if r["env"] in (a, b):
+            by[(r["model"], r["app"], r["defense"], r["trial_id"])][r["env"]] = r
+    groups: dict[tuple, list[tuple[dict, dict]]] = defaultdict(list)
+    for (model, app, defense, _), v in by.items():
+        if a in v and b in v:
+            groups[(model, app, defense)].append((v[a], v[b]))
+    lines = [f"| model | app | defense | n | {a} server s | {b} server s | {a} wall s | {b} wall s | {b}/{a} server |",
+             "|---|---|---|---|---|---|---|---|---|"]
+    for (model, app, defense), pairs in sorted(groups.items()):
+        sa = percentile([x["response"].get("server_ms", x["wall_ms"]) for x, _ in pairs], 0.5) / 1000
+        sb = percentile([y["response"].get("server_ms", y["wall_ms"]) for _, y in pairs], 0.5) / 1000
+        wa = percentile([x["wall_ms"] for x, _ in pairs], 0.5) / 1000
+        wb = percentile([y["wall_ms"] for _, y in pairs], 0.5) / 1000
+        ratio = f"{sb / sa:.1f}x" if sa else "–"
+        lines.append(f"| {model} | {app} | {defense} | {len(pairs)} | {sa:.2f} | {sb:.2f} | {wa:.2f} | {wb:.2f} | "
+                     f"{ratio} |")
     return "\n".join(lines)
 
 

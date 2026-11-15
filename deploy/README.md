@@ -83,10 +83,6 @@ curl http://localhost:8000/health
 
 `APP_API_KEY` must be set in `.env`. GPU hosts add `-f deploy/docker-compose.gpu.yml`.
 
-## 5. AWS (Stage 7) — outline, detailed commands come in Stage 7
+## 5. AWS (Stage 7)
 
-1. Before launching anything: AWS Budgets alert (~$30) and check the EC2 GPU instance quota.
-2. One EC2 instance (GPU class if the quota allows, otherwise CPU-optimized), security group: port 22 and 8000 open **only to your IP**.
-3. Install Docker, copy the repo, `docker compose up -d --build`, pull the same models.
-4. From the laptop: `python -m llmsec.harness.run --target http://<ec2-ip>:8000 --env aws ...`
-5. **Stop the instance** at the end of every session; record hours in STATE.md.
+Exact steps: [AWS_GUIDE.md](AWS_GUIDE.md) (Free plan m7i-flex.large, `deploy/aws_setup.sh`, `configs/cloud.yaml`, `python -m llmsec.harness.cloud`).

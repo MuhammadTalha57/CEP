@@ -5,12 +5,13 @@
 #   docker compose -f docker-compose.yml -f deploy/docker-compose.gpu.yml up -d --build
 services:
   ollama:
-    image: ollama/ollama   # record `docker compose exec ollama ollama --version` in STATE.md for each run
+    image: ollama/ollama:0.40.16   # pinned: same Ollama version as the Kaggle runs (results/kaggle/environment_run_*.json)
     volumes:
       - ollama:/root/.ollama
     environment:
       - OLLAMA_KEEP_ALIVE=24h      # keep the model loaded between trials
       - OLLAMA_NUM_PARALLEL=1      # one request at a time: identical conditions locally and in the cloud
+      - OLLAMA_MAX_LOADED_MODELS=1 # 8 GB RAM on the AWS Free plan instance: one model in memory at a time
     restart: unless-stopped
 
   app:
@@ -21,9 +22,13 @@ services:
       - OLLAMA_URL=http://ollama:11434/v1
       - APP_API_KEY=${APP_API_KEY:?set APP_API_KEY in .env}
       - SERVER_ENV=${SERVER_ENV:-docker}
+      - HF_HOME=/hf   # D1 detector weights, kept across container rebuilds
+    volumes:
+      - hf:/hf
     ports:
       - "8000:8000"
     restart: unless-stopped
 
 volumes:
   ollama:
+  hf:

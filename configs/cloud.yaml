@@ -1,0 +1,14 @@
+# Stage 7 cloud matrix: the AWS-hosted app is attacked over HTTP with the SAME trials as Kaggle
+# (same trial ids, seeds, payloads), so every cloud trial pairs with its Kaggle trial (report.py --compare-env).
+# The AWS Free plan only allows small CPU instances (m7i-flex.large: 2 vCPU, 8 GB, no GPU), so the matrix is a
+# subset, run in priority order. Each block resumes, so stopping at any time keeps everything finished so far.
+# Order: the two defense settings that matter most (none, layered) first, the fastest model first.
+# Edit here, not in code. Changes need user approval (skills/00-rules.md rule 15).
+env: aws
+blocks:
+  - {models: [gemma3-1b],   apps: [chatbot, rag], defense: none,    variants: 10}
+  - {models: [gemma3-1b],   apps: [chatbot, rag], defense: layered, variants: 10}
+  - {models: [llama3.2-3b], apps: [agent],        defense: none,    variants: 5}
+  - {models: [llama3.2-3b], apps: [agent],        defense: layered, variants: 5}
+  - {models: [llama3.2-3b], apps: [chatbot, rag], defense: none,    variants: 10}
+  - {models: [llama3.2-3b], apps: [chatbot, rag], defense: layered, variants: 10}

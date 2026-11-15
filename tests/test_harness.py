@@ -139,3 +139,22 @@ def test_defense_rows_pool_cells_and_pair_with_none():
     assert (rows["d1"]["asr_k"], rows["d1"]["util_k"], rows["d1"]["util_n"]) == (2, 0, 1)
     assert abs(rows["d1"]["p_vs_none"] - mcnemar_exact(8, 0)) < 1e-12
     assert "| m | rag | d1 | 2/10 |" in report.defense_markdown(recs)
+
+
+def test_cloud_plan_pairs_with_kaggle_trials(tmp_path):
+    """Cloud blocks reuse the Kaggle trial ids, so --compare-env pairs them per defense."""
+    from llmsec.defenses import detector
+    from llmsec.harness import cloud
+    detector.set_scorer(lambda text: 0.01)  # no real DeBERTa download in unit tests
+    plan = cloud.load_plan()
+    assert plan["env"] == "aws" and {b["defense"] for b in plan["blocks"]} == {"none", "layered"}
+    ex = mock_exec()
+    small = {"env": "aws", "blocks": [{"models": ["gullible"], "apps": ["chatbot"], "defense": d, "variants": 2}
+                                      for d in ("none", "layered")]}
+    assert cloud.run_plan(small, ex.execute, "http://test", out_dir=tmp_path, quiet=True) == 2 * (8 * 2 + 30)
+    for d in ("none", "layered"):  # the "kaggle" side: same trials, in process
+        run(["gullible"], ["chatbot"], d, "kaggle", variants=2, out_dir=tmp_path, send=ex.execute, quiet=True)
+    md = report.compare_markdown(report.load([tmp_path]), "env", "kaggle", "aws")
+    assert "| gullible | chatbot | layered | T1@C0 | 2 |" in md and "| gullible | chatbot | none | T1@C0 | 2 |" in md
+    assert "Identical outputs kaggle vs aws: 92/92" in md and "server s" in md
+    detector.set_scorer(None)
