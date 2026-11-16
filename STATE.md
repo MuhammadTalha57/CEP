@@ -2,7 +2,7 @@
 
 **Project:** Security Evaluation of Cloud-Hosted LLM Applications Against Prompt Injection (CEP_BRIEF.md)
 **Constraints:** Python · laptop is CPU-only, 7.4 GB RAM · open-source models only · solo · AWS credit ~$190 · repo public (master)
-**Deadline:** Sun 15 Nov 2026 (research paper; extended from 9 Nov). **Last updated:** 15 Nov 2026 (session 4)
+**Deadline:** Sun 15 Nov 2026 (research paper; extended from 9 Nov). **Last updated:** 16 Nov 2026 (session 4)
 
 ## Confirmed requirements
 - Attack evaluation (models x minimal apps x injection types) AND a proposed defense AND AWS deployment. Output = research paper.
@@ -21,7 +21,7 @@
 | 5 | Dev runs on Kaggle (user) | DONE | baseline (reports/baseline_kaggle.md) and defense runs (reports/defense_kaggle.md), 4 models |
 | 6 | Defenses + eval | DONE 15 Nov | results in reports/defense_kaggle.md; D1–D4 + layered (steps 6.1–6.5); D5 not built (limitation) |
 | 7 | AWS deployment + cloud runs | IN PROGRESS | EC2 m7i-flex.large (ap-southeast-2) deployed 15 Nov, commit 038e5a5, same Ollama + digests as Kaggle; cloud blocks running from the laptop |
-| 8 | Paper draft | IN PROGRESS | paper/main.tex + refs.bib (IEEEtran), draft 1 15 Nov; cloud section marked PENDING |
+| 8 | Paper draft | IN PROGRESS | final format = Elsevier els-cas (paper/cas/main.tex, user's template); cloud numbers are macros from scripts/cloud_compare.py; study notes in docs/ |
 
 ## Schedule (deadline Sun 15 Nov)
 Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, steps 4.1–4.3 · Fri 13: steps 4.4–4.7, pilot, local runs, defenses · Sat 14: EC2 deploy, full cloud runs, analysis · Sun 15: paper + submit. Cut order: one model -> weakest injection types -> local-only runs. Never cut cloud runs, the deterministic checker or CIs.
@@ -57,6 +57,8 @@ Thu 12: approve design, install Ollama, AWS budget alarm + GPU limit check, step
 - 14 Nov — qwen3-1.7b (hybrid model, /no_think works) still gave ~4% empty single-call answers that stop at ~2.5 s (likely occasional thinking runoff). Kept as is (counted as failed attack / failed utility), reported as a limitation; changing its settings now would break comparability with the finished baseline.
 - 14 Nov — h1_technique = T4 (best of T1–T6@C1 pooled over 3 models, 47/90 = 52%; T7@C1 49%). H1@C2 and H1@C5 run as an add-on (resume skips finished trials).
 - 14 Nov — Baseline session 2 (commit 80cc64a): qwen3-4b-instruct 1,080 trials, 0 empty, 1 error; H1 add-on 60 trials per model. Same Ollama digests as session 1 for the other models. Main new finding: the two models that resist direct injection (llama3.2-3b, qwen3-4b-instruct) are the most vulnerable to indirect injection; H1@C2 (our hybrid) is the strongest RAG cell, 67% pooled.
+- 16 Nov — Cloud run: blocks 1-3 done 15 Nov; network outage laptop->EC2 from 15 Nov 12:15 UTC (~18 h, server healthy, no OOM); runner got --status/--blocks/--retry-invalid and a run log; resumed 16 Nov 06:30 UTC. Errored records are invalid and excluded; reports keep the last record per trial.
+- 16 Nov — Paper moved to the els-cas template (user instruction). Fixed wording found while writing the docs: App B success = marker only (no URL), App C success = executed send_email to the attacker (no delete_file goal). Figures from scripts/make_figures.py (validated palette, Wilson whiskers). Study notes for the authors in docs/00-11.
 - 15 Nov — Stage 7 design: AWS Free plan only allows small CPU instances (no GPU), so the cloud host is m7i-flex.large (2 vCPU, 8 GB), staying within free credits (Free plan cannot bill beyond them). Cloud matrix = subset in priority order (configs/cloud.yaml): gemma3-1b chatbot+rag and llama3.2-3b agent (then chatbot+rag), defenses none + layered, variants 10 (agent 5), same trial ids as Kaggle for paired comparison. Ollama pinned to 0.40.16 in docker-compose. Harness runs on the laptop over HTTP (black-box, API key). Latency difference = hardware (CPU vs T4) + deployment, reported as such. compare-env fixed to pair per defense; median server/wall latency table added.
 - 15 Nov — Defense runs (commit 48cdf39, two parallel Kaggle sessions): complete for 4 models; 6 invalid (HTTP 500 from Ollama, qwen3-4b agent), 0 false positives on clean tasks. Layered: chatbot 0%, RAG 7%, agent 0% pooled ASR with unchanged utility. Key finding: D2 normalization alone repairs the zero-width carrier (T7@C4 7% -> 55%); layered order normalize -> detect fixes it (4%). Residual: visible-text RAG injection (T1/T3/T4@C1 21–36% under layered). Threshold kept at 0.85 (no tuning on the test set).
 - 14 Nov — C4 zero-width carrier ~0% ASR (1/90; H3 0/90) with the poison retrieved every time: a finding (invisible characters break tokens for small models), not a bug.
