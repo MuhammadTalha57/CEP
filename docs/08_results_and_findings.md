@@ -20,7 +20,7 @@ Charts are made by `scripts/make_figures.py` directly from `results/`.
 | F7 | **The layered defense is the best defense in every app, with no utility loss and no false positives** | Chatbot 40% → 0%, RAG 44% → 7%, agent 24% → 0%; 0 clean tasks blocked |
 | F8 | **The order of defense layers matters:** normalization alone *repairs* zero-width payloads; normalization must come before detection | D2 alone: T7@C4 7% → 55%; layered (normalize → detect): 4% |
 | F9 | **Structural defenses are the cheapest effective ones:** D2 removes all hidden carriers; D4 blocks every exfiltration | D2: hidden carriers → 0%; D4: 0/810 |
-| F10 | **Moving to the cloud did not change security outcomes,** only wording and latency | 99.3% same outcome (interim, 695 pairs); 70.8% identical text; 10–41× slower on the CPU host |
+| F10 | **Moving to the cloud did not change security outcomes,** only wording and latency | 98.9% same outcome (1,350 pairs, McNemar p = 1); 78.4% identical text; 22–41× slower on the CPU host |
 
 **Residual risk:** visible-text injection in documents still works under the layered defense: T1@C1 36%, T3@C1 22%, T4@C1 21%. The detector scores these quiet payloads below 0.85. We did **not** lower the threshold, because that would be tuning on the test set.
 

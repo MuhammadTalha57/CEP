@@ -129,7 +129,7 @@ curl.exe --max-time 10 http://<IP>:8000/health
 ## Step 6: Comparison, figures and logs (laptop)
 
 ```powershell
-.\.venv\Scripts\python scripts\cloud_compare.py      # -> reports/cloud_aws.md, paper/cloud_table.tex
+.\.venv\Scripts\python scripts\cloud_compare.py      # -> reports/cloud_aws.md, paper/cas/cloud_table.tex
 .\.venv\Scripts\python scripts\make_figures.py       # -> docs/figs/*.png, paper/cas/figs/*.pdf
 ```
 

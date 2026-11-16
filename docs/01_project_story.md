@@ -34,7 +34,7 @@ What **we** supplied at the start:
 | 14 Nov | 6. Defense runs | Two parallel Kaggle sessions, every defense × every app × 4 models | `reports/defense_kaggle.md` |
 | 15 Nov | 7. AWS deploy | EC2 instance on the Free plan; same Docker stack; laptop attacks it over HTTP | `deploy/AWS_GUIDE.md`, `results/aws/` |
 | 15 Nov | 8. Paper drafts 1–2 | IEEE draft, then edited with the academic-humanizer skill | `paper/main.tex` |
-| 15–16 Nov | 7. Cloud run | Blocks 1–3 done, then an ~18 h network interruption; runner gained `--status` / `--retry-invalid`, then resumed | `results/aws/cloud_run.log` |
+| 15–16 Nov | 7. Cloud run | Blocks 1–3 done, then an ~18 h network interruption; runner gained `--status` / `--retry-invalid`, then resumed; all 6 blocks (1,350 trials) valid by 16 Nov 08:31 UTC | `results/aws/cloud_run.log` |
 | 16 Nov | 7–8. Final | Kaggle-vs-AWS comparison, figures, els-cas paper, these study notes | `reports/cloud_aws.md`, `paper/cas/`, `docs/` |
 
 ## 1.3 The stages as a pipeline

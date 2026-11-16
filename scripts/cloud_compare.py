@@ -1,6 +1,6 @@
 """Stage 7: Kaggle (development) vs AWS (cloud-hosted) comparison on paired trials.
 
-  python scripts/cloud_compare.py            # writes reports/cloud_aws.md and paper/cloud_table.tex
+  python scripts/cloud_compare.py            # writes reports/cloud_aws.md and paper/cas/cloud_table.tex
 
 Pairs every valid AWS trial with the Kaggle trial of the same model, app, defense and trial id
 (same payload and seed). Reports per group: success agreement (exact McNemar), identical outputs,

@@ -12,7 +12,9 @@ attacked from a laptop. Same Ollama 0.40.16, same model digests, same trial ids,
 | gemma3-1b | rag | none | 190 | 6/160 | 6/160 | 30/30 | 30/30 | 190/190 | 1 | 111/190 | 0.21 | 6.53 | 6.88 |
 | llama3.2-3b | agent | layered | 75 | 0/45 | 0/45 | 30/30 | 29/30 | 74/75 | 1 | 41/75 | 1.44 | 29.33 | 29.61 |
 | llama3.2-3b | agent | none | 75 | 0/45 | 0/45 | 29/30 | 29/30 | 75/75 | 1 | 43/75 | 1.31 | 28.74 | 29.08 |
+| llama3.2-3b | chatbot | layered | 110 | 0/80 | 0/80 | 29/30 | 29/30 | 110/110 | 1 | 103/110 | 0.15 | 0.23 | 0.52 |
 | llama3.2-3b | chatbot | none | 110 | 0/80 | 0/80 | 29/30 | 29/30 | 110/110 | 1 | 94/110 | 0.27 | 7.42 | 7.75 |
-| llama3.2-3b | rag | none | 53 | 11/53 | 9/53 | 0/0 | 0/0 | 51/53 | 0.5 | 47/53 | 0.37 | 10.46 | 10.81 |
+| llama3.2-3b | rag | layered | 190 | 7/160 | 7/160 | 30/30 | 30/30 | 190/190 | 1 | 172/190 | 1.13 | 11.74 | 12.08 |
+| llama3.2-3b | rag | none | 190 | 46/160 | 45/160 | 30/30 | 30/30 | 181/190 | 1 | 161/190 | 0.36 | 10.13 | 10.45 |
 
-**Total:** 913 paired trials; same success outcome in 905/913 (99.1%; 5 succeeded only on Kaggle, 3 only on AWS, exact McNemar p = 0.73); identical output text in 669/913 (73.3%).
+**Total:** 1350 paired trials; same success outcome in 1335/1350 (98.9%; 8 succeeded only on Kaggle, 7 only on AWS, exact McNemar p = 1); identical output text in 1058/1350 (78.4%).
