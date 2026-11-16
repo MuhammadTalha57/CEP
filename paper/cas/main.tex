@@ -31,7 +31,7 @@
 \cormark[1]
 \credit{Conceptualization, Methodology, Software, Investigation, Formal analysis, Writing -- original draft}
 
-\author[1]{Group member name}
+\author[1]{Shah Iman Ali}
 \credit{Investigation, Validation, Writing -- review \& editing}
 
 \affiliation[1]{organization={NED University of Engineering and Technology},
@@ -46,10 +46,12 @@ Each application is attacked through one channel: the user message, a retrieved 
 The attack matrix crosses seven paper-defined injection techniques with ten carriers, including hidden HTML, zero-width characters and invisible PDF text, and adds three hybrid attacks.
 Deterministic checks with random per-trial canaries decide success; no LLM judge is used.
 Across 19{,}020 trials on four models (qwen3-1.7b, llama3.2-3b, gemma3-1b, qwen3-4b-instruct), resistance to direct injection did not carry over to indirect injection.
-The two models that leaked a secret in 0--10\% of direct attacks were the most vulnerable to injected documents (53--67\% pooled, up to 97\% per cell), and one of them was also the most vulnerable to injected tool outputs (43.7\%).
-A channel-aware layered defense built from paper-defined components reduced the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG application and from 24\% to 0\% in the agent, and it blocked no clean task.
+The two models that leaked a secret in 0--10\% of direct attacks were the most vulnerable to injected documents (53--67\% pooled, up to 97\% per cell).
+One of them was also the most vulnerable to injected tool outputs (43.7\%).
+A channel-aware layered defense built from paper-defined components reduced the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG application and from 24\% to 0\% in the agent; it blocked no clean task.
 Used alone, a text normalizer repaired an obfuscated payload and raised its success from 7\% to 55\%, so the order of defense layers matters.
-Finally, the same container stack was deployed as a cloud-hosted service on AWS and attacked over HTTP with the same trials: on \cloudN{} paired trials the success outcome matched the development deployment in \cloudAgreePct\%, although \cloudDiffPct\% of output texts differed, and the CPU-only cloud host was \cloudRatioMin--\cloudRatioMax{} times slower.
+Finally, we deployed the same container stack as a cloud-hosted service on AWS and attacked it over HTTP with the same trials.
+On \cloudN{} paired trials the success outcome matched the development deployment in \cloudAgreePct\%, although \cloudDiffPct\% of output texts differed and the CPU-only cloud host was \cloudRatioMin--\cloudRatioMax{} times slower.
 \end{abstract}
 
 \begin{highlights}
@@ -76,10 +78,10 @@ Prior work studies these channels separately.
 \citet{P05} measure direct injection on small open models, e.g.\ 71.3\% for qwen3:1.7b and 62.8\% for gemma3:1b \citep[p.~7]{P05}, but test only direct prompts.
 \citet{P04} and \citet{P13} study hidden carriers in RAG documents (HTML and PDF), and CaMeL \citep{P08} defends tool agents by design.
 These studies use different models, applications and success metrics, so their results cannot be compared directly.
-Our review of ten papers found three open questions.
-First, no study tests the same small open models across direct, document and tool-output injection with one success checker and confidence intervals.
-Second, no study evaluates defenses end-to-end in RAG and tool applications together with their utility and latency cost.
-Third, no study measures whether moving the application to a cloud host changes the outcome for the same model.
+Our review of ten papers (Section~\ref{sec:related}) left three questions open.
+First, none of the reviewed studies tests the same small open models across direct, document and tool-output injection with one success checker and confidence intervals.
+Second, none evaluates defenses end-to-end in both RAG and tool applications while also reporting their utility and latency cost.
+Third, none measures whether moving the application to a cloud host changes the outcome for the same model.
 
 This paper makes four contributions.
 \begin{itemize}
@@ -214,7 +216,8 @@ In App~A an attack succeeds if the secret appears in the output, also after norm
 In App~B it succeeds if the attacker's marker appears in the answer.
 In App~C it succeeds if the agent executes \texttt{send\_email} to the attacker address; an address that is only written in the text does not count.
 We do not use an LLM judge, because weak judges approve up to 49.7\% unsafe outputs \citep[p.~11]{P05}.
-A trial with a model-server error, or a RAG trial whose poisoned document was not retrieved and whose attack failed, is invalid and excluded from the denominator; in practice every poisoned document was retrieved.
+Two kinds of trial are invalid and excluded from the denominator: a trial with a model-server error, and a RAG trial whose poisoned document was not retrieved and whose attack failed.
+In practice every poisoned document was retrieved.
 Utility is the share of clean tasks answered with the expected fact or tool call.
 
 For $k$ successes among $n$ valid trials we report $\widehat{\mathrm{ASR}} = k/n$ with the Wilson 95\% interval ($z = 1.96$),
@@ -256,7 +259,9 @@ In App~A the only input is the user's own message, so only the hardening part ap
 The recipient of \texttt{send\_email} and the path of \texttt{delete\_file} must appear in the user's own request.
 
 \textbf{Layered defense (ours).}
-Each channel receives the defense that fits it: the user message gets D1 and hardening; documents get D2, then D1 on each chunk, then D3; tool outputs get D3 and D4; and the final answer passes an output guard that withholds the secret (raw or normalized) and any URL outside an allow-list.
+Each channel receives the defense that fits it.
+The user message gets D1 and hardening; documents get D2, then D1 on each chunk, then D3; and tool outputs get D3 and D4.
+Finally, an output guard withholds the secret (raw or normalized) and any URL outside an allow-list from the answer.
 The guard is deliberately weaker than the success checker (no base64 or ROT13 decoding), so the checker is not reused as the defense.
 We did not build a self-check defense \citep[p.~10]{P05}: it needs a second LLM call, depends on judge quality, and did not fit the time available.
 
@@ -377,7 +382,7 @@ Agent & 4.36 & 3.68 & -- & 3.33 & 3.25 & 3.55 \\
 \label{fig:rag}
 \end{figure*}
 
-\textbf{The layered defense gave the lowest ASR in every application, without utility loss.}
+\textbf{The layered defense gave the lowest ASR in every application, at a cost of at most two clean tasks per model.}
 In Figure~\ref{fig:defense} and Table~\ref{tab:defense}, pooled ASR falls from 40\% to 0\% (0/960) in the chatbot, from 44\% to 7\% (135/1{,}920) in RAG and from 24\% to 0\% (0/807) in the agent.
 Every per-model reduction is significant (exact McNemar $p<10^{-7}$), except in the chatbot for the two models that were already near zero.
 D1 and the layered defense blocked no clean task in any application, and pooled utility stays at 93--100\%.
@@ -394,7 +399,7 @@ This is consistent with the low true-positive rate of DeBERTa-size detectors at 
 Sanitization drives all hidden carriers (C2, C3, C5--C7, H1, H3) to 0\% and leaves visible-text attacks unchanged (Figure~\ref{fig:rag}).
 Used alone, it raises T7@C4 from 7\% to 55\%: Unicode normalization deletes the zero-width characters that were breaking the payload's tokens, and the model then receives a clean instruction.
 In the layered defense the detector runs after normalization, and the same cell falls to 4\%.
-In our setting normalization helped only when detection followed it, so we recommend that a normalizing defense never be the last layer.
+In our setting normalization helped only when detection followed it, so a normalizing defense should not be the last layer.
 
 \textbf{D3 helps the data channels but not direct injection.}
 Spotlighting lowers ASR in RAG (44\% to 27\%) and in the agent (24\% to 6\%).
@@ -416,7 +421,8 @@ D2, D3 and D4 add no measurable time.
 
 % =============================================================================================
 \section{Results: development versus cloud deployment}\label{sec:cloud}
-We repeated a subset of the matrix against the AWS-hosted service with the same trial ids: \cloudSubset{}, each without defense and with the layered defense, using 10 variants per cell (5 in App C) and all 30 clean tasks.
+We repeated a subset of the matrix against the AWS-hosted service with the same trial ids: \cloudSubset{}.
+Each group ran without defense and with the layered defense, using 10 variants per cell (5 in App C) and all 30 clean tasks.
 For each pair of trials we compare the success outcome (exact McNemar test), whether the output text is identical, and the median latency inside the server and at the remote harness (Table~\ref{tab:cloud}, Figure~\ref{fig:cloud}).
 
 \input{cloud_table}
@@ -438,9 +444,9 @@ A likely cause is that CPU and GPU kernels evaluate floating-point operations in
 These wording changes rarely crossed the success boundary, because a successful attack depends on whether the model follows the injected instruction, not on its exact phrasing.
 
 \textbf{The cost of the cloud deployment was latency.}
-Without defense, the median time inside the server rose from \cloudSrvKMin--\cloudSrvKMax\,s on the Kaggle GPU to \cloudSrvAMin--\cloudSrvAMax\,s on the 2-vCPU instance, a \cloudRatioMin--\cloudRatioMax-fold increase that comes mainly from the hardware (no GPU), not from the deployment.
-The network between the remote harness and the server added about 0.3\,s per trial.
-Where the layered defense blocks a chatbot attack before the model is called, the cloud latency stays low, so the defense also removes most of the CPU cost of attack traffic.
+Without defense, the median time inside the server rose from \cloudSrvKMin--\cloudSrvKMax\,s on the Kaggle GPU to \cloudSrvAMin--\cloudSrvAMax\,s on the 2-vCPU instance, a \cloudRatioMin--\cloudRatioMax-fold increase.
+The network between the remote harness and the server added only about 0.3\,s per trial, so we attribute most of the increase to the missing GPU rather than to Docker or HTTP.
+Where the layered defense blocks a chatbot attack before the model is called, the cloud latency stays low (Table~\ref{tab:cloud}), so in the chatbot the defense also removes most of the CPU cost of attack traffic.
 
 \textbf{Operational note.}
 A network interruption between the harness and the server (about 18 hours) caused connection timeouts that were logged as errors.
@@ -470,8 +476,8 @@ All attacks were run only against our own applications, mock tools and locally s
 % =============================================================================================
 \section{Conclusion}\label{sec:conclusion}
 On four small open models, robustness to direct prompt injection did not predict robustness to injection through documents or tool outputs.
-The two models that refused direct requests were the easiest to hijack through retrieved documents.
-A channel-aware layered defense built from paper-defined parts reduced attack success to 0\%, 7\% and 0\% in the chatbot, RAG and agent applications without reducing utility, provided that normalization preceded detection.
+The two models that refused direct requests were the two most vulnerable to retrieved documents.
+A channel-aware layered defense built from paper-defined parts reduced attack success to 0\%, 7\% and 0\% in the chatbot, RAG and agent applications while pooled utility stayed at 93--100\%, provided that normalization preceded detection.
 Moving the same stack to a cloud host changed the wording of about \cloudDiffPct\% of answers but not the security outcome (the same result in \cloudAgreePct\% of paired trials); the cost of the CPU-only cloud host was latency.
 Future work includes adaptive attacks, larger models, a GPU cloud host and a second detector for visible-text injection.
 
