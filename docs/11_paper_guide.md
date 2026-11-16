@@ -8,7 +8,7 @@
 | `paper/cas/refs.bib` | References (metadata from `data/papers/*.json`) |
 | `paper/cas/cloud_table.tex`, `paper/cas/cloud_numbers.tex` | **Generated** by `scripts/cloud_compare.py`: the Kaggle-vs-AWS table and every cloud number used in the text. Never edit by hand |
 | `paper/cas/figs/*.pdf` | **Generated** by `scripts/make_figures.py` from `results/` |
-| `paper/cas/cas-dc.cls`, `cas-common.sty`, `cas-model2-names.bst` | Template files (LaTeX Project Public License) |
+| `paper/cas/cas-dc.cls`, `cas-common.sty`, `cas-model2-names.bst`, `elsarticle-num-names.bst` | Template and bibliography-style files (LaTeX Project Public License) |
 | `paper/cas/main.pdf` | Compiled paper |
 | `paper/facts.md` | Every citable number from the papers, with its page |
 | `paper/main.tex` | Older IEEE-format draft. **Superseded** by `paper/cas/main.tex` (it also has two wording errors about the success checks, fixed in the cas version) |
@@ -67,5 +67,5 @@ Then recompile. The text, table and figures update together, so they cannot disa
 ## 11.5 Template notes (cas-dc quirks we hit)
 
 - In this class, `figure` takes key-value options: write `\begin{figure}[pos=!htbp]`. A plain `[!htbp]` is ignored, and the figures drift to the end.
-- Citations use natbib author–year: `\citet{P05}` gives "Jaiswal et al. (2026)" and `\citep[p.~7]{P05}` gives "(Jaiswal et al., 2026, p. 7)".
+- Citations are numbered (natbib `numbers`, Elsevier style `elsarticle-num-names.bst`, copied into `paper/cas/`): `\citet{P05}` gives "Jaiswal et al. [1]" and `\citep[p.~7]{P05}` gives "[1, p. 7]". References are numbered in order of first citation. The template's default `cas-model2-names.bst` (author–year) is kept in the folder but no longer used.
 - Wide tables and figures use `table*` / `figure*` (both columns).
