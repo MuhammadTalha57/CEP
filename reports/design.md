@@ -1,7 +1,7 @@
 # Experiment and system design (Stage 4 plan) — STATUS: APPROVED by user 13 Nov 2026
 
 Scope locked 12 Nov 2026: **G1** (attacks: models x apps x injection types) + **G2** (defenses with utility and latency cost) + **G3** (the apps under test are cloud-hosted on AWS; local runs are for development and for the local-vs-cloud comparison).
-Paper references use `Pxx pN` = paper id and PDF page, taken from data/papers/*.json. `[OURS]` = our own design choice; `[INFERENCE]` = reasoning, not evidence.
+Paper references use `Pxx pN` = paper id and PDF page, taken from literature/papers/*.json. `[OURS]` = our own design choice; `[INFERENCE]` = reasoning, not evidence.
 
 ---
 
@@ -101,7 +101,7 @@ We separate **what the payload says (technique)** from **where it is hidden (car
 - App C: T1–T7 via C8, T7 via C9, plus H2 = **9**.
 - **32 attack cells per model per defense setting**, each with **n = 30** payload variants (30 wordings of the same technique, random canary/marker each). P10 p4 shows n = 80 already gives about 20-point-wide intervals at 28.75%, so n = 30 means we report wide CIs honestly and compare cells with paired tests rather than over-claim.
 - Plus ~30 clean tasks per app for utility.
-- Rough load: 32 x 30 + 90 = about **1,050 calls per model per defense setting**. The pilot measures seconds per call locally and on EC2, and the final size follows from it (formula and numbers go in STATE.md).
+- Rough load: 32 x 30 + 90 = about **1,050 calls per model per defense setting**. The pilot measures seconds per call locally and on EC2, and the final size follows from it (formula and numbers in configs/experiment.yaml).
 
 ## 5. Defenses — baselines from papers + one layered defense [OURS]
 
@@ -170,7 +170,7 @@ tests/                 unit tests with the mock backend
 | 4.4 | App C: mock tools, agent loop, carriers C8–C9 | Claude | Fri |
 | 4.5 | Attack generator: T1–T7 x 30 variants, hybrids H1–H3 | Claude | Fri |
 | 4.6 | Harness runner, JSONL logging, Wilson/McNemar stats, report tables | Claude | Fri |
-| 4.7 | Docker Compose; **timing pilot** run on the laptop; final matrix size into STATE.md | Claude writes, user runs | Fri |
+| 4.7 | Docker Compose; **timing pilot** run on the laptop; final matrix size into configs/experiment.yaml | Claude writes, user runs | Fri |
 | 5 | Local runs (reduced n, at least one model at full n for G3) | User | Fri night |
 | 6.1–6.6 | D1, D2, D3, D4, (D5), layered — one commit each, with tests | Claude | Fri/Sat |
 | 7 | EC2 deploy, full runs on the cloud endpoint, stop instance | User (Claude gives commands) | Sat |

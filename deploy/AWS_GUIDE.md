@@ -82,7 +82,7 @@ Then type `exit`.
 ## Step 5: Run the cloud matrix from the laptop (PowerShell, hours)
 Keep the laptop plugged in and stop it from sleeping: **Settings → System → Power → "When plugged in, put my device to sleep after" → Never**.
 ```powershell
-cd "C:\Users\muham\Desktop\NED\7th Semester\CC\CEP\.claude\worktrees\repo-analysis-state-ecb866"
+cd <path-to-your-clone>
 git pull origin master
 mkdir results\aws -Force
 scp -i "$HOME\Downloads\cep-key.pem" ubuntu@<IP>:environment_aws.json results\aws\environment_aws.json
@@ -96,7 +96,7 @@ $env:PYTHONPATH = "src"
 - If the progress lines show `error=...HTTP 401`, the key differs from the server's. If they show `ConnectError`, check that the instance is running and the 8000 rule is "My IP".
 
 ## Step 6: Finish and shut down (AWS console, 2 min)
-1. Tell Claude the run is finished (or stopped). Claude builds the comparison and commits it.
+1. Build the comparison with `python scripts/cloud_compare.py` and `python scripts/make_figures.py`, then commit `results/aws` and the regenerated files.
 2. **EC2 → Instances** → select `cep-llm-lab` → **Instance state → Terminate (delete) instance** → confirm. The 30 GB disk is deleted with it.
 3. **EC2 → Volumes**: should be empty. **EC2 → Elastic IPs**: should be empty.
 4. **Billing → Credits**: the used amount should be a few dollars at most.

@@ -20,7 +20,7 @@ ollama pull gemma3:1b
 ollama --version
 ```
 
-Record the Ollama version in STATE.md. `OLLAMA_URL` defaults to `http://localhost:11434/v1`; to change it, copy `.env.example` to `.env` and set the variable in your shell.
+The Ollama version is recorded in results/*/environment_*.json. `OLLAMA_URL` defaults to `http://localhost:11434/v1`; to change it, copy `.env.example` to `.env` and set the variable in your shell.
 
 ## 1b. Model runs on Kaggle (chosen 13 Nov; the laptop only runs code and mock tests)
 
@@ -43,7 +43,7 @@ Results land in `results/kaggle/` (experiments) and `results/kaggle-pilot/` (pil
 .venv/Scripts/python -m llmsec.harness.pilot --models qwen3-1.7b llama3.2-3b gemma3-1b
 ```
 
-Takes roughly 21 trials per model per app. It writes `reports/pilot_local-pilot.md` (seconds per trial, estimated full-matrix hours, tool-call support, thinking check) and logs in `results/local-pilot/`. Commit both. Claude sizes the final matrix from this file.
+Takes roughly 21 trials per model per app. It writes `reports/pilot_local-pilot.md` (seconds per trial, estimated full-matrix hours, tool-call support, thinking check) and logs in `results/local-pilot/`. Commit both. The final matrix size in configs/experiment.yaml was chosen from this file.
 
 Close other heavy apps (browser tabs, Docker Desktop) while running: RAM is the bottleneck.
 

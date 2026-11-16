@@ -1,4 +1,4 @@
-"""Name -> defense class. D5 (self-check) not implemented, see STATE.md."""
+"""Name -> defense class. D5 (self-check) not implemented (see the paper, Limitations)."""
 from __future__ import annotations
 
 from .base import Defense, NoDefense

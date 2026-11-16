@@ -1,6 +1,6 @@
-# Gap analysis (Stage 3, skills/03)
+# Gap analysis (Stage 3)
 
-Input: data/papers/*.json of the 10 kept papers only: P01, P02, P03, P04, P05, P06, P08, P09, P10, P13 (P07, P11, P12 excluded). Every number carries paper id and PDF page. `[INFERENCE]` marks my reasoning. Page refs come from the JSONs, whose quotes were machine-checked for P09-P13 only; P01-P08 pages were not re-verified this session.
+Input: literature/papers/*.json of the 10 kept papers only: P01, P02, P03, P04, P05, P06, P08, P09, P10, P13 (P07, P11, P12 excluded). Every number carries paper id and PDF page. `[INFERENCE]` marks my reasoning. Page refs come from the JSONs, whose quotes were machine-checked for P09-P13 only; P01-P08 pages were not re-verified this session.
 
 ## A. Injection type x paper coverage
 
@@ -61,7 +61,7 @@ Input: data/papers/*.json of the 10 kept papers only: P01, P02, P03, P04, P05, P
 
 ### G1. No paper tests the same small open models across direct, RAG-document and tool-output injection with one success checker and CIs (RECOMMENDED)
 - **Evidence:** P05 covers six small open models but direct prompts only, no CIs, inconsistent denominators (p1, p7; flags). P13 covers six open models but only PDF hidden text, one payload, one run per document (p1, p5). P04 covers RAG carriers but the generator is unnamed (p3). P08 covers tools but only closed models (p1, p7). Absent across the 10 kept papers: any evaluation of one model set over all three app types.
-- **Why it matters:** this is exactly the brief: models x minimal apps x injection types, with success reported. It also fixes the denominator and CI problems listed in STATE.
+- **Why it matters:** this is exactly the brief: models x minimal apps x injection types, with success reported. It also fixes the denominator and CI problems noted in literature/ranking.md.
 - **Testable here (no GPU, open small models)?** Yes: Python harness, deterministic checks (P13 tracer style, P10 failure signals), Wilson CIs (P10 p4). Size the model count and trials after a timing pilot on our machine; I do not yet have our own timing logs. [INFERENCE] P10 shows n=80 gives intervals about 18-20 points wide (28.75%: 20.0-39.5, p4), so per-cell n must be larger than that to separate models.
 - **Risk:** the matrix grows fast; cut models or injection types before trials per cell.
 

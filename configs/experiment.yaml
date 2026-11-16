@@ -1,5 +1,5 @@
 # Experiment matrix (design.md §4.4). Cell = "<technique>@<carrier>"; "U" = clean utility tasks.
-# `--defense all` runs each app's `defenses` list. Edit here, not in code. Changes to cells need user approval (skills/00-rules.md rule 15).
+# `--defense all` runs each app's `defenses` list. Edit here, not in code.
 name: main
 variants: 30          # payload variants per attack cell (design.md §4.4)
 temperature: 0.0      # design.md §2 sampling policy

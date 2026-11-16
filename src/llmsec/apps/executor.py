@@ -2,7 +2,7 @@
 
 One code path for both, so local in-process runs, local HTTP runs and AWS runs execute identical logic.
 Request: {"model": id, "defense": name, "seed": int, "request": {"app": ..., <app input>, "lab": {...}}}
-`lab` is the lab-only experiment setup (secret, planted docs/emails/pages); see design.md §3.
+`lab` is the lab-only experiment setup (secret, planted docs/emails/pages); see reports/design.md §3.
 """
 from __future__ import annotations
 

@@ -3,7 +3,7 @@
 # The AWS Free plan only allows small CPU instances (m7i-flex.large: 2 vCPU, 8 GB, no GPU), so the matrix is a
 # subset, run in priority order. Each block resumes, so stopping at any time keeps everything finished so far.
 # Order: the two defense settings that matter most (none, layered) first, the fastest model first.
-# Edit here, not in code. Changes need user approval (skills/00-rules.md rule 15).
+# Edit here, not in code.
 env: aws
 blocks:
   - {models: [gemma3-1b],   apps: [chatbot, rag], defense: none,    variants: 10}

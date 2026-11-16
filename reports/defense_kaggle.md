@@ -5,7 +5,7 @@
 - Same Ollama digests as the baseline (`results/kaggle/environment_run_*.json`). The baseline rows (`none`) are the files from reports/baseline_kaggle.md, unchanged.
 - Regenerate: `python -m llmsec.harness.report results/kaggle --defense-table` (per model), and `--compare-defense none <d>` (per cell, paired McNemar).
 
-**Defenses** (design.md §5; details in STATE.md 13 Nov):
+**Defenses** (reports/design.md §5; settings in configs/defenses.yaml):
 - **D1** ProtectAI DeBERTa-v3 prompt-injection detector, threshold 0.85 (P06 p4), on the user message, retrieved chunks and tool outputs.
 - **D2** sanitize: normalization, then visible text only from HTML/PDF.
 - **D3** spotlighting + prompt hardening: wraps untrusted data in tags; App A gets hardening only.

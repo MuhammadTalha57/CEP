@@ -13,3 +13,4 @@ paper/**/*.blg
 paper/**/*.out
 paper/**/*.abs
 paper/**/main.log
+logs/

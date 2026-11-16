@@ -1,8 +1,0 @@
-cd "C:\Users\muham\Desktop\NED\7th Semester\CC\CEP\.claude\worktrees\repo-analysis-state-ecb866"
-curl.exe http://13.211.211.240:8000/health
-.\.venv\Scripts\python -m llmsec.harness.cloud --target http://13.211.211.240:8000
-cd "C:\Users\muham\Desktop\NED\7th Semester\CC\CEP\.claude\worktrees\repo-analysis-state-ecb866"
-.\.venv\Scripts\python -m llmsec.harness.cloud --status
-curl.exe --max-time 10 http://13.211.211.240/:8000/health
-curl.exe --max-time 10 http://13.211.211.240:8000/health
-.\.venv\Scripts\python -m llmsec.harness.cloud --target http://13.211.211.240:8000 --blocks 4 5 6 --retry-invalid

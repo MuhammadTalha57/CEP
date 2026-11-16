@@ -1,9 +1,9 @@
-"""Figures for docs/ and the paper, computed from results/ (never typed in by hand).
+"""Figures for the reports and the paper, computed from results/ (never typed in by hand).
 
-  python scripts/make_figures.py      # writes docs/figs/*.png and paper/cas/figs/*.pdf
+  python scripts/make_figures.py      # writes reports/figs/*.png and paper/figs/*.pdf
 
 Colors: validated categorical palette (dataviz reference, light mode, fixed order); every bar carries a
-direct value label and every figure has a table in docs/ (contrast relief for the lighter slots).
+direct value label and every figure has a table in reports/ (contrast relief for the lighter slots).
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ MODELS = ["qwen3-1.7b", "llama3.2-3b", "gemma3-1b", "qwen3-4b-instruct"]
 APPS = [("chatbot", "Chatbot (App A)"), ("rag", "RAG (App B)"), ("agent", "Agent (App C)")]
 DEFS = [("none", "none"), ("d1_detector", "D1 detector"), ("d2_sanitize", "D2 sanitize"),
         ("d3_spotlight", "D3 spotlight"), ("d4_toolpolicy", "D4 tool policy"), ("layered", "Layered (ours)")]
-OUT_PNG, OUT_PDF = ROOT / "docs" / "figs", ROOT / "paper" / "cas" / "figs"
+OUT_PNG, OUT_PDF = ROOT / "reports" / "figs", ROOT / "paper" / "figs"
 
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9, "axes.edgecolor": MUTED,
                      "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": INK, "text.color": INK,

@@ -1,4 +1,4 @@
-# Defense settings (design.md §5). Changes need user approval (skills/00-rules.md rule 15).
+# Defense settings (design.md §5).
 
 detector:                       # D1 (P03 p8-9 detector family; P09 p8 same model; P06 p4 gateway blocking)
   model: protectai/deberta-v3-base-prompt-injection-v2   # 184M, public on Hugging Face

@@ -1,4 +1,4 @@
-# Citable facts for the paper (built from data/papers/*.json; every row has a PDF page ref)
+# Citable facts for the paper (built from literature/papers/*.json; every row has a PDF page ref)
 
 | Paper | Fact | Number | PDF page |
 |---|---|---|---|

@@ -2,7 +2,8 @@
 @inproceedings{P01,
   author    = {Jiawen Shi and Zenghui Yuan and Yinuo Liu and Yue Huang and Pan Zhou and Lichao Sun and Neil Zhenqiang Gong},
   title     = {Optimization-based Prompt Injection Attack to {LLM}-as-a-Judge},
-  booktitle = {Proc. ACM Conference on Computer and Communications Security (CCS)},
+  booktitle = {Proc. ACM SIGSAC Conference on Computer and Communications Security (CCS)},
+  pages     = {660--674},
   year      = {2024},
   doi       = {10.1145/3658644.3690291}
 }
@@ -10,6 +11,7 @@
   author    = {Dario Pasquini and Martin Strohmeier and Carmela Troncoso},
   title     = {Neural Exec: Learning (and Learning from) Execution Triggers for Prompt Injection Attacks},
   booktitle = {Proc. ACM Workshop on Artificial Intelligence and Security (AISec)},
+  pages     = {89--100},
   year      = {2024},
   doi       = {10.1145/3689932.3694764}
 }
@@ -17,6 +19,7 @@
   author    = {Dennis Jacob and Hend Alzahrani and Zhanhao Hu and Basel Alomair and David Wagner},
   title     = {{PromptShield}: Deployable Detection for Prompt Injection Attacks},
   booktitle = {Proc. ACM Conference on Data and Application Security and Privacy (CODASPY)},
+  pages     = {341--352},
   year      = {2025},
   doi       = {10.1145/3714393.3726501}
 }
@@ -30,7 +33,8 @@
 @inproceedings{P05,
   author    = {Piyush Jaiswal and Aaditya Pratap and Shreyansh Saraswati and Harsh Kasyap and Somanath Tripathy},
   title     = {Analysis of {LLMs} Against Prompt Injection and Jailbreak Attacks},
-  booktitle = {Proc. LM-SHIELD Workshop (ACM)},
+  booktitle = {Proc. Workshop on Privacy in Large Language Models and Natural Language Processing (LM-SHIELD)},
+  pages     = {10--21},
   year      = {2026},
   doi       = {10.1145/3803628.3807972}
 }
@@ -38,6 +42,7 @@
   author    = {Rrezearta Thaqi and Edlira Martiri and Blerim Rexha},
   title     = {A Real-Time Framework for Prompt Injection Attacks Detection on Cloud-Hosted Large Language Models},
   booktitle = {Proc. IEEE Int. Conf. on Foundation and Large Language Models (FLLM)},
+  pages     = {718--723},
   year      = {2025},
   doi       = {10.1109/FLLM67465.2025.11391009}
 }
@@ -45,6 +50,7 @@
   author    = {Edoardo Debenedetti and Ilia Shumailov and Tianqi Fan and Jamie Hayes and Nicholas Carlini and Daniel Fabian and Christoph Kern and Chongyang Shi and Andreas Terzis and Florian Tram{\`e}r},
   title     = {Defeating Prompt Injections by Design},
   booktitle = {Proc. IEEE Conference on Secure and Trustworthy Machine Learning (SaTML)},
+  pages     = {587--618},
   year      = {2026},
   doi       = {10.1109/SaTML68715.2026.00040}
 }
@@ -54,6 +60,7 @@
   journal   = {IEEE Transactions on Dependable and Secure Computing},
   volume    = {23},
   number    = {5},
+  pages     = {11069--11083},
   year      = {2026},
   doi       = {10.1109/TDSC.2026.3709894}
 }
@@ -61,6 +68,7 @@
   author    = {Fardani Annisa Damastuti and Agustinus Bimo Gumelar and Kenan Firmansyah and Ibrohim Yofid Fananda and Jauari Akhmad Nur Hasim and Aji Sapta Pramulen and Irma Wulandari and Yunifa Miftachul Arif and others},
   title     = {Pre-Decision Personality Grounding Improves the Robustness of {LLM} {NPCs} Against Adversarial Prompts},
   booktitle = {Proc. Int. Conf. on Technology Innovation and Its Applications (ICTIIA)},
+  pages     = {1--6},
   year      = {2026},
   doi       = {10.1109/ICTIIA70925.2026.11717422}
 }
@@ -68,13 +76,71 @@
   author    = {Songul Erdem Guler and Muhammed Ali Aydin},
   title     = {Visual and Structural Prompt Injection in Medical {RAG} Systems: A Comparative Robustness Analysis},
   booktitle = {Proc. Int. Congress on Human-Computer Interaction, Optimization and Robotic Applications (ICHORA)},
+  pages     = {1--7},
   year      = {2026},
   doi       = {10.1109/ICHORA69329.2026.11536987}
 }
 @misc{protectai,
   author       = {{Protect AI}},
   title        = {deberta-v3-base-prompt-injection-v2},
+  year         = {2024},
   howpublished = {Hugging Face model card, \url{https://huggingface.co/protectai/deberta-v3-base-prompt-injection-v2}}
+}
+% Background references (not part of the ranked set of 10). Metadata checked on 16 Nov 2026 against
+% Crossref (DOIs), arXiv (author lists), usenix.org (pages), proceedings.neurips.cc and genai.owasp.org.
+@inproceedings{greshake2023,
+  author    = {Kai Greshake and Sahar Abdelnabi and Shailesh Mishra and Christoph Endres and Thorsten Holz and Mario Fritz},
+  title     = {Not What You've Signed Up For: Compromising Real-World {LLM}-Integrated Applications with Indirect Prompt Injection},
+  booktitle = {Proc. 16th ACM Workshop on Artificial Intelligence and Security (AISec)},
+  pages     = {79--90},
+  year      = {2023},
+  doi       = {10.1145/3605764.3623985}
+}
+@inproceedings{liu2024,
+  author    = {Yupei Liu and Yuqi Jia and Runpeng Geng and Jinyuan Jia and Neil Zhenqiang Gong},
+  title     = {Formalizing and Benchmarking Prompt Injection Attacks and Defenses},
+  booktitle = {Proc. 33rd USENIX Security Symposium},
+  pages     = {1831--1847},
+  year      = {2024}
+}
+@misc{owasp2025,
+  author       = {{OWASP Foundation}},
+  title        = {{LLM01:2025} Prompt Injection, {OWASP} Top 10 for {LLM} Applications},
+  year         = {2025},
+  howpublished = {\url{https://genai.owasp.org/llmrisk/llm01-prompt-injection/}}
+}
+@inproceedings{echoleak2025,
+  author    = {Pavan Reddy and Aditya Sanjay Gujral},
+  title     = {{EchoLeak}: The First Real-World Zero-Click Prompt Injection Exploit in a Production {LLM} System},
+  booktitle = {Proc. AAAI Fall Symposium Series},
+  year      = {2025},
+  note      = {arXiv:2509.10540}
+}
+@misc{hines2024,
+  author       = {Keegan Hines and Gary Lopez and Matthew Hall and Federico Zarfati and Yonatan Zunger and Emre Kiciman},
+  title        = {Defending Against Indirect Prompt Injection Attacks With Spotlighting},
+  year         = {2024},
+  howpublished = {arXiv:2403.14720}
+}
+@inproceedings{agentdojo2024,
+  author    = {Edoardo Debenedetti and Jie Zhang and Mislav Balunovi{\'c} and Luca Beurer-Kellner and Marc Fischer and Florian Tram{\`e}r},
+  title     = {{AgentDojo}: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for {LLM} Agents},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS), Datasets and Benchmarks Track},
+  year      = {2024}
+}
+@misc{nasr2025,
+  author       = {Milad Nasr and Nicholas Carlini and Chawin Sitawarin and Sander V. Schulhoff and Jamie Hayes and Michael Ilie and Juliette Pluto and Shuang Song and Harsh Chaudhari and Ilia Shumailov and Abhradeep Thakurta and Kai Yuanqing Xiao and Andreas Terzis and Florian Tram{\`e}r},
+  title        = {The Attacker Moves Second: Stronger Adaptive Attacks Bypass Defenses Against {LLM} Jailbreaks and Prompt Injections},
+  year         = {2025},
+  howpublished = {arXiv:2510.09023}
+}
+@inproceedings{yi2025,
+  author    = {Jingwei Yi and Yueqi Xie and Bin Zhu and Emre Kiciman and Guangzhong Sun and Xing Xie and Fangzhao Wu},
+  title     = {Benchmarking and Defending Against Indirect Prompt Injection Attacks on Large Language Models},
+  booktitle = {Proc. 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+  pages     = {1809--1820},
+  year      = {2025},
+  doi       = {10.1145/3690624.3709179}
 }
 @misc{repo,
   author       = {Muhammad Talha},

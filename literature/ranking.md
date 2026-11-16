@@ -1,6 +1,6 @@
-# Ranking and exclusion (final for Stage 2; skills/02)
+# Ranking and exclusion (final for Stage 2)
 
-Data: data/citations.csv and data/artifacts.csv fetched 2026-11-07 09:06 UTC. Shortlist approved by user (assumed as proposed in the provisional version: core + related-work kept, P07/P11/P12 excluded). All sub-scores are [INFERENCE] using the skills/02 weights.
+Data: literature/metrics/citations.csv and literature/metrics/artifacts.csv fetched 2026-11-07 09:06 UTC. Shortlist approved by user (assumed as proposed in the provisional version: core + related-work kept, P07/P11/P12 excluded). All sub-scores are [INFERENCE] using the weights shown in the table header.
 
 | Rank | ID | Rel /40 | Rigor /20 | Artifacts /15 | Cites /10 (source counts) | Venue+recency /10 | Threat model /5 | Total /100 | Decision | One-line reason (page refs) |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -26,10 +26,10 @@ Data: data/citations.csv and data/artifacts.csv fetched 2026-11-07 09:06 UTC. Sh
 - **Artifacts /15:** P03 (HF dataset apache-2.0, 9 likes; GitHub 4 stars, last push 2025-10-27, no license shown) and P08 (GitHub Apache-2.0, 418 stars, last push 2025-06-20) score 14 (not run, so not 15). P09: jackhhao dataset apache-2.0 and ahsanayub mit verified, guychuk HTTP 401, protectai model not fetched: 8. P06 repo 404: 2. P01 arXiv link only: 3.
 - Venue, threat-model and relevance sub-scores are judgement; no venue-ranking figures were recalled.
 
-## Screening (skills/00 rule 11)
+## Screening
 
 10 of 13 kept (core: P03, P04, P05, P08, P13; related-work: P01, P02, P06, P09, P10); P07, P11, P12 excluded for evidence quality. No hard-exclude criteria met; no duplicates (DOI + title check). Exactly 10 remain, so no slack; no papers were added to reach a count.
 
 ## Not comparable (rule 4)
 
-Success rates in P05, P10 and P13 use different benchmarks, models and success definitions; see reports/gaps.md for the metric table.
+Success rates in P05, P10 and P13 use different benchmarks, models and success definitions; see literature/gaps.md for the metric table.
