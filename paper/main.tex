@@ -31,7 +31,8 @@ One of them, qwen3-4b-instruct, was also the most vulnerable to injected tool ou
 A channel-aware layered defense, built from paper-defined components, reduced the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG app and from 24\% to 0\% in the agent.
 It blocked no clean task.
 Used on its own, a text normalizer repaired an obfuscated payload and raised its success from 7\% to 55\%, so the order of defense layers matters.
-Finally, we deployed the same container stack as a cloud-hosted service on AWS and attacked it over HTTP with the same trials \pending{cloud result sentence}.
+Finally, we deployed the same container stack as a cloud-hosted service on AWS and attacked it over HTTP with the same trials.
+On \pending{695} paired trials the success outcome matched the development deployment in \pending{99.3\%} of cases, although about 30\% of output texts differed; the cost of the CPU-only cloud host was latency.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -389,15 +390,31 @@ D2, D3 and D4 add no measurable time.
 % ---------------------------------------------------------------------------------------------
 \section{Results: Development vs. Cloud Deployment}\label{sec:cloud}
 We repeated a subset of the matrix against the AWS-hosted service with the same trial ids.
-The subset covers gemma3-1b in Apps A and B and llama3.2-3b in App C, each without defense and with the layered defense, using 10 variants per cell (5 in App C) and all 30 clean tasks \pending{final cloud subset and trial count}.
+The subset covers gemma3-1b in Apps A and B and llama3.2-3b in App C, each without defense and with the layered defense, using 10 variants per cell (5 in App C) and all 30 clean tasks.
+\pending{if blocks 5--6 finish: add llama3.2-3b in Apps A and B.}
 For each pair of trials we compare the success outcome (exact McNemar test), whether the output text is identical, and the median latency inside the server and at the remote harness.
+Table~\ref{tab:cloud} lists the results.
 
-\pending{Table: per model/app/defense -- paired n, Kaggle ASR, AWS ASR, McNemar p, identical outputs, median server latency Kaggle vs AWS, wall latency.}
+\input{cloud_table}
 
-Preliminary results cover the first 25 chatbot trials of gemma3-1b without defense.
-All 25 had the same success outcome on both deployments, and 21 had word-for-word identical outputs.
-The median time per trial was 6.9\,s inside the CPU server and 7.2\,s at the remote harness, against 0.4\,s on the Kaggle GPU \pending{replace with final numbers}.
-These early pairs suggest that, at temperature~0, the deployment changes the wording of some answers (CPU and GPU arithmetic differ slightly) without changing whether an attack succeeds.
+\textbf{Security outcomes did not change.}
+Over \pending{695} paired trials, the success outcome was the same on both deployments in \pending{690 (99.3\%)}.
+\pending{Two} attacks succeeded only on Kaggle and \pending{three} only on AWS (exact McNemar $p=1$), and no group shows a significant difference.
+ASR and utility agree within one trial per group, with and without the layered defense.
+
+\textbf{Output text changed in about 30\% of trials.}
+Only \pending{492 of 695 (70.8\%)} outputs were word-for-word identical, although both deployments use the same Ollama version, model digest, prompt, seed and temperature~0.
+A likely cause is that the CPU and GPU kernels compute in a different floating-point order, so near-ties between tokens resolve differently and the continuation diverges.
+These wording changes rarely crossed the success boundary, because a successful attack depends on whether the model follows the injected instruction, not on its exact phrasing.
+
+\textbf{The cost of the cloud deployment was latency.}
+The median time inside the server rose from 0.17--2.09\,s on the Kaggle GPU to 6.5--34\,s on the 2-vCPU instance, a 10--41$\times$ increase that comes mainly from the hardware (no GPU), not from the deployment.
+The network between the remote harness and the server (Pakistan to Sydney) added about 0.3\,s per trial.
+Where the layered defense blocks a chatbot attack before the model is called, the cloud latency stays low (0.22\,s median), so the defense also removes most of the CPU cost of attack traffic.
+
+\textbf{Operational note.}
+A network interruption between the harness and the server (about 18 hours) caused connection timeouts that were logged as errors.
+The server itself stayed up, with no out-of-memory events; the affected trials were re-run, and errored records are excluded from the analysis.
 
 % ---------------------------------------------------------------------------------------------
 \section{Discussion and Limitations}
@@ -425,7 +442,7 @@ We ran all attacks only against our own applications, mock tools and locally ser
 On four small open models, robustness to direct prompt injection did not predict robustness to injection through documents or tool outputs.
 The two models that refused direct requests were the easiest to hijack through retrieved documents.
 A channel-aware layered defense built from paper-defined parts reduced attack success to 0\%, 7\% and 0\% in the chatbot, RAG and agent applications without reducing utility, provided that normalization preceded detection.
-\pending{one sentence on the cloud comparison.}
+Moving the same stack to a cloud host changed the wording of about 30\% of answers but not the security outcome (same success result in \pending{99.3\%} of paired trials); the cost of the CPU-only cloud host was latency.
 Future work includes adaptive attacks, larger models, a GPU cloud host and a second detector for visible-text injection.
 
 \bibliographystyle{IEEEtran}

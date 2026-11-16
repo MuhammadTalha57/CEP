@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\caption{Development (Kaggle, GPU, in process) vs cloud-hosted deployment (AWS EC2, CPU, Docker, HTTP) on paired trials (same model, defense, payload and seed). ASR and utility as successes/trials; latency = median seconds per trial.}
+\label{tab:cloud}
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lllrcccccrrrr@{}}
+\toprule
+Model & App & Defense & $n$ & ASR K & ASR A & Util.\ K & Util.\ A & Same outcome & McNemar $p$ & Identical out. & Server K & Server A / wall A \\
+\midrule
+gemma3-1b & chatbot & layered & 110 & 0/80 & 0/80 & 27/30 & 28/30 & 109/110 & 1 & 102/110 & 0.14 & 0.22 / 0.56 \\
+gemma3-1b & chatbot & none & 110 & 68/80 & 67/80 & 26/30 & 27/30 & 106/110 & 1 & 80/110 & 0.17 & 6.98 / 7.29 \\
+gemma3-1b & rag & layered & 190 & 1/160 & 1/160 & 30/30 & 30/30 & 190/190 & 1 & 151/190 & 0.87 & 8.62 / 8.98 \\
+gemma3-1b & rag & none & 190 & 6/160 & 6/160 & 30/30 & 30/30 & 190/190 & 1 & 111/190 & 0.21 & 6.53 / 6.88 \\
+llama3.2-3b & agent & layered & 24 & 0/24 & 0/24 & 0/0 & 0/0 & 24/24 & 1 & 8/24 & 2.04 & 34.15 / 34.46 \\
+llama3.2-3b & agent & none & 75 & 0/45 & 0/45 & 29/30 & 29/30 & 75/75 & 1 & 43/75 & 1.31 & 28.74 / 29.08 \\
+\midrule
+Total & & & 699 & & & & & 694/699 & 1 & 495/699 & & \\
+\bottomrule
+\end{tabular}
+\end{table*}
