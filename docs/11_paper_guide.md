@@ -18,7 +18,7 @@
 | Section | Content | Source in the repo |
 |---|---|---|
 | Highlights (separate page) | 5 one-line findings | 08_results_and_findings.md |
-| Abstract | Setting, matrix, main numbers | all reports |
+| Abstract | Setting, method, four headline findings (kept short on purpose) | all reports |
 | 1 Introduction | Problem, 3 gaps, 4 contributions | reports/gaps.md |
 | 2 Background and related work | Literature selection method, 10 kept papers grouped by topic, with page-cited numbers | data/papers/*.json, reports/ranking.md, paper/facts.md |
 | 3 Threat model | Attacker capabilities and goals per app | reports/design.md §3 |
@@ -29,7 +29,7 @@
 | 8 Results: development vs cloud | Table 5, Fig. 5 | reports/cloud_aws.md |
 | 9 Discussion and limitations | Implications, 7 limitations, ethics | — |
 | 10 Conclusion | | — |
-| End matter | Data availability, competing interests, **generative-AI declaration** (Elsevier requires it), CRediT roles, references | — |
+| End matter | Data and code availability, references (the declarations and CRediT statement were removed at the authors' request) | — |
 
 ## 11.3 Compile
 
@@ -59,12 +59,10 @@ miktex packages install inconsolata
 
 Then recompile. The text, table and figures update together, so they cannot disagree.
 
-## 11.4 Things the authors must fill in (marked `TODO` in `main.tex`)
+## 11.4 Author details (done)
 
-1. The group mate's name, in place of "Group member name".
-2. The department in the affiliation (left out on purpose, so as not to guess it).
-3. Optionally an email (`\ead{...}`) and ORCID iDs.
-4. The CRediT roles (`\credit{...}`): adjust to who did what.
+- Authors: Muhammad Talha and Shah Iman Ali, Department of Software Engineering, NED University of Engineering and Technology; both emails in the first-page footnote (`\ead{...}`).
+- No corresponding-author mark and no ORCID line; the page footer reads "M. Talha, S. I. Ali: Cloud Computing CEP, NED University". These overrides are in the preamble of `main.tex` (`\ExplSyntaxOn` block).
 
 ## 11.5 Template notes (cas-dc quirks we hit)
 

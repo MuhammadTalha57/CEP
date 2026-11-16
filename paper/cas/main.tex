@@ -9,6 +9,12 @@
 \usepackage{url}
 
 \input{cloud_numbers}
+% footer text and no empty ORCID footnote (class defaults: "Preprint submitted to Elsevier", "ORCID(s):")
+\ExplSyntaxOn
+\cs_set:Npn \__first_footerline: { \group_begin: \small \sffamily \__short_authors: :~ { \rmfamily \itshape Cloud~ Computing~ CEP,~ NED~ University } \group_end: }
+\RenewDocumentCommand \printorcid { } { }
+\bool_gset_true:N \g_stm_nologo_bool  % "Email addresses:" as text instead of the missing icon image
+\ExplSyntaxOff
 \sloppy  % long monospace identifiers cannot hyphenate; stretch spaces instead of overflowing the column
 % keep figures and tables near their first mention instead of collecting them at the end
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}
@@ -21,37 +27,27 @@
 \def\textpagefraction{.001}
 
 \shorttitle{Prompt injection in cloud-hosted LLM applications}
-\shortauthors{M. Talha et al.}
+\shortauthors{M. Talha, S. I. Ali}
 
 \title [mode = title]{Security evaluation of cloud-hosted LLM applications against direct and indirect prompt injection}
 
-%% TODO (authors): add the department to organization={...}, an email with \ead{...} if required,
-%% and replace "Group member name" with the group mate's real name.
 \author[1]{Muhammad Talha}
-\cormark[1]
-\credit{Conceptualization, Methodology, Software, Investigation, Formal analysis, Writing -- original draft}
+\ead{talha4600894@cloud.neduet.edu.pk}
 
 \author[1]{Shah Iman Ali}
-\credit{Investigation, Validation, Writing -- review \& editing}
+\ead{ali4600130@cloud.neduet.edu.pk}
 
-\affiliation[1]{organization={NED University of Engineering and Technology},
+\affiliation[1]{organization={Department of Software Engineering, NED University of Engineering and Technology},
             city={Karachi},
             country={Pakistan}}
 
-\cortext[1]{Corresponding author}
-
 \begin{abstract}
-We evaluate small open-weight language models inside three common LLM applications: a support chatbot, a retrieval-augmented question-answering (RAG) service and a tool-using email agent.
-Each application is attacked through one channel: the user message, a retrieved document or a tool output.
-The attack matrix crosses seven paper-defined injection techniques with ten carriers, including hidden HTML, zero-width characters and invisible PDF text, and adds three hybrid attacks.
-Deterministic checks with random per-trial canaries decide success; no LLM judge is used.
-Across 19{,}020 trials on four models (qwen3-1.7b, llama3.2-3b, gemma3-1b, qwen3-4b-instruct), resistance to direct injection did not carry over to indirect injection.
-The two models that leaked a secret in 0--10\% of direct attacks were the most vulnerable to injected documents (53--67\% pooled, up to 97\% per cell).
-One of them was also the most vulnerable to injected tool outputs (43.7\%).
-A channel-aware layered defense built from paper-defined components reduced the pooled attack success rate from 40\% to 0\% in the chatbot, from 44\% to 7\% in the RAG application and from 24\% to 0\% in the agent; it blocked no clean task.
-Used alone, a text normalizer repaired an obfuscated payload and raised its success from 7\% to 55\%, so the order of defense layers matters.
-Finally, we deployed the same container stack as a cloud-hosted service on AWS and attacked it over HTTP with the same trials.
-On \cloudN{} paired trials the success outcome matched the development deployment in \cloudAgreePct\%, although \cloudDiffPct\% of output texts differed and the CPU-only cloud host was \cloudRatioMin--\cloudRatioMax{} times slower.
+We evaluate small open-weight language models against prompt injection inside three LLM applications: a support chatbot, a retrieval-augmented question-answering (RAG) service and a tool-using email agent.
+Each application is attacked through one channel (the user message, a retrieved document or a tool output) with paper-defined injection techniques and hidden carriers such as invisible HTML and PDF text.
+Deterministic canary checks decide success.
+Across 19{,}020 trials on four models, robustness to direct injection did not carry over to indirect injection: the two models that resisted direct attacks were the most vulnerable to injected documents.
+A channel-aware layered defense built from published components reduced the pooled attack success rate to 0\%, 7\% and 0\% in the three applications without blocking any clean task, provided that text normalization preceded detection.
+When the same stack ran on AWS and was attacked over HTTP, the security outcome matched the development deployment in \cloudAgreePct\% of paired trials; the cloud host changed answer wording and latency, not attack success.
 \end{abstract}
 
 \begin{highlights}
@@ -484,14 +480,6 @@ Future work includes adaptive attacks, larger models, a GPU cloud host and a sec
 % =============================================================================================
 \section*{Data and code availability}
 All code, configurations, raw JSONL logs (one line per trial) and analysis scripts are available at \url{https://github.com/MuhammadTalha57/CEP} \citep{repo}.
-
-\section*{Declaration of competing interest}
-The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
-
-\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
-During the preparation of this work the authors used Claude (Anthropic) as an AI coding and writing assistant for implementing the experiment software, analysing the logs and drafting and editing the text. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
-
-\printcredits
 
 \bibliographystyle{cas-model2-names}
 \bibliography{refs}
