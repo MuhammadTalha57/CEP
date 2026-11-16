@@ -61,8 +61,10 @@ Then recompile. The text, table and figures update together, so they cannot disa
 
 ## 11.4 Author details (done)
 
-- Authors: Muhammad Talha and Shah Iman Ali, Department of Software Engineering, NED University of Engineering and Technology; both emails in the first-page footnote (`\ead{...}`).
-- No corresponding-author mark and no ORCID line; the page footer reads "M. Talha, S. I. Ali: Cloud Computing CEP, NED University". These overrides are in the preamble of `main.tex` (`\ExplSyntaxOn` block).
+- Authors: Muhammad Talha (affiliation a) and Shah Iman Ali (affiliation b), each with Department of Software Engineering, NED University of Engineering and Technology, Karachi.
+- Both are marked as corresponding authors; the footnote (`\cortext[1]{...}`) reads "∗Corresponding authors" followed by both emails, then the template's "ORCID(s):" line.
+- The page footer is the template default: "M. Talha and S. I. Ali: Preprint submitted to Elsevier" (`\shortauthors`).
+- The abstract follows six parts: importance, gap, objective, method, key findings, implications.
 
 ## 11.5 Template notes (cas-dc quirks we hit)
 
