@@ -17,7 +17,6 @@
 
 | Section | Content | Source in the repo |
 |---|---|---|
-| Highlights (separate page) | 5 one-line findings | 08_results_and_findings.md |
 | Abstract | Setting, method, four headline findings (kept short on purpose) | all reports |
 | 1 Introduction | Problem, 3 gaps, 4 contributions | reports/gaps.md |
 | 2 Background and related work | What prompt injection is (8 background references, docs/02 end), literature selection method, 10 kept papers grouped by topic, with page-cited numbers | data/papers/*.json, reports/ranking.md, paper/facts.md |

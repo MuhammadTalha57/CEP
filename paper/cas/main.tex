@@ -9,6 +9,8 @@
 \usepackage{url}
 
 \input{cloud_numbers}
+% reference list ragged-right, so long URLs and DOIs do not stretch the spaces in a line
+\makeatletter\AtBeginDocument{\g@addto@macro\bibfont{\raggedright}}\makeatother
 \sloppy  % long monospace identifiers cannot hyphenate; stretch spaces instead of overflowing the column
 % keep figures and tables near their first mention instead of collecting them at the end
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}
@@ -52,14 +54,6 @@ A channel-aware layered defense reduced the pooled attack success rate to 0\%, 7
 The cloud deployment matched the development outcome in \cloudAgreePct\% of paired trials and changed only wording and latency.
 These results suggest that developers should protect each data channel separately rather than rely on a model's refusals, and should normalize text before detecting injections.
 \end{abstract}
-
-\begin{highlights}
-\item Robustness to direct prompt injection did not predict robustness to injected documents or tool outputs.
-\item Hidden HTML carriers were as effective as visible text against a naive RAG ingestion pipeline.
-\item A layered, channel-aware defense cut attack success to 0\%, 7\% and 0\% with no clean task blocked.
-\item Unicode normalization alone repaired zero-width payloads; it must precede detection.
-\item Moving the same stack to AWS changed answer wording and latency, not the attack outcome.
-\end{highlights}
 
 \begin{keywords}
 prompt injection \sep large language models \sep retrieval-augmented generation \sep LLM agents \sep cloud security \sep defense evaluation
