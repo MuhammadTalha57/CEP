@@ -158,3 +158,18 @@ def test_cloud_plan_pairs_with_kaggle_trials(tmp_path):
     assert "| gullible | chatbot | layered | T1@C0 | 2 |" in md and "| gullible | chatbot | none | T1@C0 | 2 |" in md
     assert "Identical outputs kaggle vs aws: 92/92" in md and "server s" in md
     detector.set_scorer(None)
+
+
+def test_cloud_status_and_retry_invalid(tmp_path):
+    """Trials logged with a connection error count as failed and are redone with retry_invalid."""
+    from llmsec.harness import cloud
+    plan = {"env": "aws", "blocks": [{"models": ["gullible"], "apps": ["chatbot"], "defense": "none", "variants": 1}]}
+    down = lambda body: {"output": "", "error": "ConnectTimeout: down"}
+    cloud.run_plan(plan, down, "http://x", out_dir=tmp_path, quiet=True)
+    st = cloud.plan_status(plan, out_dir=tmp_path)[0]
+    assert (st["planned"], st["valid"], st["failed"]) == (8 + 30, 0, 38)
+    assert cloud.run_plan(plan, mock_exec().execute, "http://x", out_dir=tmp_path, quiet=True) == 0  # skipped
+    assert cloud.run_plan(plan, mock_exec().execute, "http://x", out_dir=tmp_path, quiet=True, retry_invalid=True) == 38
+    st = cloud.plan_status(plan, out_dir=tmp_path)[0]
+    assert (st["valid"], st["failed"]) == (38, 0)
+    assert len(report.load([tmp_path])) == 38  # report keeps the last record per trial
