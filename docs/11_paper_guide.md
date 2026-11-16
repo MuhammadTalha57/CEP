@@ -29,7 +29,7 @@
 | 8 Results: development vs cloud | Table 5, Fig. 5 | reports/cloud_aws.md |
 | 9 Discussion and limitations | Implications, 7 limitations, ethics | — |
 | 10 Conclusion | | — |
-| End matter | Data and code availability, references (the declarations and CRediT statement were removed at the authors' request) | — |
+| End matter | References only (the data-availability section, declarations and CRediT statement were removed at the authors' request) | — |
 
 ## 11.3 Compile
 
