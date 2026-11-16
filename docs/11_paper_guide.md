@@ -20,7 +20,7 @@
 | Highlights (separate page) | 5 one-line findings | 08_results_and_findings.md |
 | Abstract | Setting, method, four headline findings (kept short on purpose) | all reports |
 | 1 Introduction | Problem, 3 gaps, 4 contributions | reports/gaps.md |
-| 2 Background and related work | Literature selection method, 10 kept papers grouped by topic, with page-cited numbers | data/papers/*.json, reports/ranking.md, paper/facts.md |
+| 2 Background and related work | What prompt injection is (8 background references, docs/02 end), literature selection method, 10 kept papers grouped by topic, with page-cited numbers | data/papers/*.json, reports/ranking.md, paper/facts.md |
 | 3 Threat model | Attacker capabilities and goals per app | reports/design.md §3 |
 | 4 System and methodology | Fig. 1 architecture; apps; models; attack matrix (Table 1); success checks; Wilson and McNemar formulas; deployments | reports/design.md, src/llmsec |
 | 5 Defenses | D1–D4 and the layered defense | src/llmsec/defenses, configs/defenses.yaml |

@@ -72,6 +72,8 @@ prompt injection \sep large language models \sep retrieval-augmented generation 
 A cloud-hosted LLM application passes untrusted text to its model: user messages, documents retrieved from a knowledge base and the outputs of tools such as email or web access.
 Prompt injection hides instructions in that text.
 A successful injection can make the application leak a secret, return a manipulated answer or perform an action that the user never requested.
+OWASP ranks prompt injection first among the risks to LLM applications \citep{owasp2025}.
+In one documented production case, EchoLeak (CVE-2025-32711), a single crafted email made Microsoft 365 Copilot exfiltrate data without any user interaction \citep{echoleak2025}.
 
 Prior work studies these channels separately.
 \citet{P05} measure direct injection on small open models, e.g.\ 71.3\% for qwen3:1.7b and 62.8\% for gemma3:1b \citep[p.~7]{P05}, but test only direct prompts.
@@ -92,10 +94,19 @@ This paper makes four contributions.
 
 % =============================================================================================
 \section{Background and related work}\label{sec:related}
+\textbf{Prompt injection.}
+An LLM receives its developer's instructions and untrusted input in one context window, with no hard boundary between them, so text that looks like an instruction may be followed as one \citep{greshake2023}.
+In direct injection the attacker types the payload into the application.
+In indirect injection the payload arrives inside content that the application processes, such as a web page, a retrieved document or an email \citep{greshake2023,owasp2025}.
+\citet{greshake2023} demonstrated indirect injection against deployed LLM-integrated applications.
+\citet{liu2024} formalized the attack and benchmarked 5 attacks and 10 defenses on 10 LLMs and 7 tasks, and \citet{yi2025} built a benchmark for indirect injection.
+Our three applications cover one direct channel (App~A) and two indirect channels (Apps~B and C).
+
 \textbf{Literature selection.}
 We extracted 13 peer-reviewed papers into structured records in which every value carries its PDF page and a short verbatim quote.
 We scored each paper out of 100 (relevance 40, rigour 20, public artifacts 15, citations per year 10, venue and recency 10, threat model 5).
 Ten papers were kept; three were excluded for evidence quality: inconsistent percentages, results available only in figures, or a simulation without injection types.
+The background works cited in this section outside the ten provide context and were not part of the ranking.
 
 \textbf{Direct injection techniques.}
 \citet{P01} list manual techniques: naive instruction, escape characters, context ignoring, fake completion and their combination.
@@ -110,7 +121,7 @@ Its macro-average success of 24.9\% falls to 4.7\% with all defenses, at a cost 
 
 \textbf{Tool agents.}
 CaMeL \citep{P08} takes control flow only from the trusted user request and treats tool outputs as data.
-It solves 77\% of AgentDojo tasks with security guarantees, against 84\% undefended \citep[p.~1]{P08}.
+It solves 77\% of AgentDojo \citep{agentdojo2024} tasks with security guarantees, against 84\% undefended \citep[p.~1]{P08}.
 
 \textbf{Detectors and cloud deployment.}
 In PromptShield \citep{P03}, a 184M-parameter DeBERTa detector reaches 43.22\% true-positive rate at 1\% false-positive rate, against 94.80\% for a fine-tuned Llama-3.1-8B \citep[p.~9]{P03}.
@@ -250,8 +261,9 @@ A score above 0.85 \citep[p.~4]{P06} blocks the input in the chatbot and drops t
 Unicode NFKC normalization removes format characters such as zero-width and bidirectional controls.
 Visible-text extraction then drops hidden HTML elements, alt/ARIA text, PDF white or sub-1\,pt text and PDF metadata.
 
-\textbf{D3, spotlighting and hardening} \citep[p.~10]{P05}.
-Untrusted text is wrapped in \texttt{<UNTRUSTED\_DATA>} tags, and the system prompt states that such data is never an instruction.
+\textbf{D3, spotlighting and hardening} \citep{hines2024}, \citep[p.~10]{P05}.
+Spotlighting marks untrusted text so that the model can tell it apart from instructions; on GPT-family models it reduced indirect-injection success from over 50\% to below 2\% \citep{hines2024}.
+We use its delimiting form: untrusted text is wrapped in \texttt{<UNTRUSTED\_DATA>} tags, and the system prompt states that such data is never an instruction.
 In App~A the only input is the user's own message, so only the hardening part applies.
 
 \textbf{D4, tool policy}, a simplified CaMeL rule \citep[p.~1, p.~4]{P08}.
@@ -461,8 +473,9 @@ Classifier-based detection helped, but it needed normalized text and still misse
 \textbf{Limitations.}
 \begin{itemize}
 \item We tested only small quantized models (1--4B parameters); larger models may behave differently.
-\item The attacks are fixed templates, not adaptive or optimization-based attacks \citep{P01,P02}.
+\item The attacks are fixed templates, not adaptive or optimization-based attacks \citep{P01,P02}. Adaptive attacks bypassed 12 recent defenses with success above 90\% for most \citep{nasr2025}, so our defense results likely overstate the protection against an adaptive attacker.
 \item The cloud host is CPU-only because the AWS Free plan excludes GPU instances, so latency differences mix hardware and deployment; we report them separately from security outcomes.
+\item We evaluated one cloud provider (AWS) with a self-managed model server, not managed LLM services or other providers.
 \item The cloud subset is smaller than the Kaggle matrix because of CPU speed and the deadline.
 \item The endpoint used HTTP restricted to one IP address with an API key, without HTTPS, an API gateway or managed logging.
 \item D4 is a simplified data-flow rule, not the full CaMeL interpreter, and we did not evaluate a self-check defense.

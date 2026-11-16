@@ -146,3 +146,20 @@ Format of each card: problem → idea → key numbers (with PDF page) → what w
 3. **Tool agents** have one strong design defense (P08), tested only on closed models.
 4. **Detectors** are cheap, but small ones miss many attacks at low false-positive rates (P03). Cloud papers (P06, P09) report detector F1, not end-to-end attack success.
 5. **Nobody** tests the same small open models across all three channels with one success checker and CIs (G1), measures defenses end-to-end with utility and latency (G2), or compares the same model in a development deployment and a cloud deployment (G3).
+
+## Background references (added 16 Nov, outside the ranked ten)
+
+Taken from our earlier proposal report and checked online (Crossref, arXiv, usenix.org, NeurIPS proceedings, OWASP) before citing. They give context and support specific sentences; they were **not** scored or ranked.
+
+| Key | Reference | Used in the paper for |
+|---|---|---|
+| greshake2023 | Greshake et al., AISec 2023, pp. 79–90, doi 10.1145/3605764.3623985 | Definition and root cause (instructions and data share one context window); first demonstration of indirect injection on deployed apps |
+| liu2024 | Liu et al., USENIX Security 2024, pp. 1831–1847 | Formal benchmark: 5 attacks, 10 defenses, 10 LLMs, 7 tasks |
+| yi2025 | Yi et al., KDD 2025, pp. 1809–1820, doi 10.1145/3690624.3709179 | A benchmark for indirect injection (BIPIA) |
+| owasp2025 | OWASP Top 10 for LLM Applications 2025, LLM01:2025 Prompt Injection | Prompt injection is risk #1; direct vs indirect definitions |
+| echoleak2025 | Reddy and Gujral, AAAI Fall Symposium 2025 (arXiv:2509.10540) | Real cloud case: CVE-2025-32711, one email made Microsoft 365 Copilot leak data, zero-click |
+| hines2024 | Hines et al., arXiv:2403.14720 (2024) | Origin of spotlighting (our D3); >50% to <2% on GPT-family models |
+| agentdojo2024 | Debenedetti et al., NeurIPS 2024 Datasets and Benchmarks | The benchmark behind CaMeL's 77% task figure |
+| nasr2025 | Nasr et al., arXiv:2510.09023 (2025) | Limitation: adaptive attacks bypassed 12 defenses with >90% success for most |
+
+Not carried over from the proposal: the three-cloud plan (we used AWS only, now stated as a limitation), vendor blog posts, the Sysdig "LLMjacking" post (credential theft, not prompt injection), and two 2026 preprints we could not verify.
