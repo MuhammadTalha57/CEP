@@ -5,3 +5,11 @@ __pycache__/
 .env
 *.egg-info/
 results/_scratch/
+
+# LaTeX build files
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.out
+paper/**/*.abs
+paper/**/main.log
