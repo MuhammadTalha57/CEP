@@ -24,7 +24,7 @@ from llmsec.harness.stats import percentile, wilson  # noqa: E402
 SLOTS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]
 INK, MUTED, GRID = "#262624", "#6b6a64", "#e4e3de"
 MODELS = ["qwen3-1.7b", "llama3.2-3b", "gemma3-1b", "qwen3-4b-instruct"]
-APPS = [("chatbot", "Chatbot (App A)"), ("rag", "RAG (App B)"), ("agent", "Agent (App C)")]
+APPS = [("chatbot", "Chatbot (App A, direct)"), ("rag", "RAG (App B, indirect)"), ("agent", "Agent (App C, indirect)")]
 DEFS = [("none", "none"), ("d1_detector", "D1 detector"), ("d2_sanitize", "D2 sanitize"),
         ("d3_spotlight", "D3 spotlight"), ("d4_toolpolicy", "D4 tool policy"), ("layered", "Layered (ours)")]
 OUT_PNG, OUT_PDF = ROOT / "reports" / "figs", ROOT / "paper" / "figs"
@@ -150,56 +150,6 @@ def fig_cloud(recs):
     save(fig, "fig_cloud_latency")
 
 
-def fig_architecture():
-    """System overview: harness, the two deployments, the server with apps + defense hooks, Ollama."""
-    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
-    fig, ax = plt.subplots(figsize=(11.5, 4.9))
-    ax.set_xlim(0, 100)
-    ax.set_ylim(0, 44)
-    ax.axis("off")
-
-    def box(x, y, w, h, text, fc="#f4f3ef", ec=MUTED, bold=False, fs=7.2):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.4,rounding_size=1.2", fc=fc, ec=ec, lw=0.8))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
-                fontweight="bold" if bold else "normal", color=INK, linespacing=1.25)
-
-    def arrow(x1, y1, x2, y2, text="", dy=1.2):
-        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=8, lw=0.8, color=INK))
-        if text:
-            ax.text((x1 + x2) / 2, (y1 + y2) / 2 + dy, text, ha="center", fontsize=6.4, color=MUTED)
-
-    # harness
-    box(1, 27, 19, 13, "Harness (attacker side)\n\ntrial generator\nT1-T7 x C0-C9 + H1-H3\n30 variants per cell\n"
-                       "runner, checker, statistics", fs=7.6)
-    box(1, 9, 19, 11, "JSONL logs\n\nresults/<env>/<model>/\n<app>__<defense>.jsonl", fc="#ffffff", fs=7.6)
-    arrow(10.5, 27, 10.5, 20.4)
-    # deployments (two lanes between harness and server)
-    arrow(20.6, 36, 37.4, 36)
-    ax.text(29, 37.4, "Kaggle: in process\n(2x T4 GPU)", ha="center", va="bottom", fontsize=7, color=MUTED)
-    arrow(20.6, 29, 37.4, 29)
-    ax.text(29, 27.6, "AWS: HTTP + API key\n(EC2 m7i-flex.large, CPU,\nDocker Compose)", ha="center", va="top",
-            fontsize=7, color=MUTED)
-    # server
-    ax.add_patch(FancyBboxPatch((38, 3), 44, 39, boxstyle="round,pad=0.4,rounding_size=1.5", fc="#ffffff",
-                                ec=MUTED, lw=0.8, ls="--"))
-    ax.text(60, 40.2, "App server: FastAPI /v1/run (identical code on Kaggle and AWS)", ha="center",
-            fontsize=7.6, color=MUTED)
-    box(40, 27, 12.5, 9.5, "App A\nchatbot\nsecret in prompt", fc="#e8f1fc", fs=7.4)
-    box(53.8, 27, 12.5, 9.5, "App B\nRAG (BM25)\n20 HTML/PDF docs", fc="#e8f1fc", fs=7.4)
-    box(67.6, 27, 12.5, 9.5, "App C\ntool agent\nmock email/files", fc="#e8f1fc", fs=7.4)
-    box(40, 13.5, 40.1, 9, "Defense hooks: check_input, sanitize_document, wrap_untrusted,\nsystem_addendum, "
-                           "check_tool_call, check_output\n(D1 detector, D2 sanitize, D3 spotlight, D4 policy, layered)",
-        fc="#eaf6ef", fs=7.2)
-    box(40, 4.5, 40.1, 5.5, "LLMClient: OpenAI-compatible, temperature 0, fixed seed", fs=7.4)
-    for x in (46.2, 60, 73.8):
-        arrow(x, 27, x, 22.9)
-    arrow(60, 13.5, 60, 10.4)
-    # ollama
-    box(86, 3, 13, 14, "Ollama 0.40.16\n\nqwen3-1.7b\nllama3.2-3b\ngemma3-1b\nqwen3-4b-instruct", fc="#fdf3e1", fs=7.2)
-    arrow(80.6, 7.2, 85.6, 7.2)
-    save(fig, "fig_architecture")
-
-
 def fig_direct_indirect(recs):
     """Direct (App A, user message) versus indirect (Apps B and C, documents and tool outputs), no defense."""
     base = [r for r in recs if r["env"] == "kaggle" and r["defense"] == "none" and r["kind"] == "attack"]
@@ -220,10 +170,122 @@ def fig_direct_indirect(recs):
     save(fig, "fig_direct_indirect")
 
 
+TECHS = ["T1", "T2", "T3", "T4", "T5", "T6", "T7"]
+
+
+def fig_direct(recs):
+    """Direct injection (App A, C0): ASR per technique and model, no defense."""
+    base = [r for r in recs if r["env"] == "kaggle" and r["defense"] == "none" and r["app"] == "chatbot"
+            and r["kind"] == "attack"]
+    groups = TECHS + ["H2"]
+    vals = {t: {m: rate(base, technique=t, model=m) for m in MODELS} for t in groups}
+    fig, ax = plt.subplots(figsize=(7.0, 2.6))
+    grouped(ax, groups, [(m, m) for m in MODELS], vals, SLOTS, "Attack success rate (%)", 112)
+    ax.set_xticks(range(len(groups)), ["T1\nnaive", "T2\nignore", "T3 fake\ncompletion", "T4\nescape", "T5\nrole",
+                                       "T6\nauthority", "T7\ncombined", "H2 split\n(ours)"], fontsize=7.5)
+    ax.legend(ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.2), fontsize=8)
+    ax.set_title("Direct injection, App A (user message), no defense; n = 30 per bar", fontsize=8.5, color=MUTED,
+                 pad=24)
+    save(fig, "fig_direct")
+
+
+def fig_indirect(recs):
+    """Indirect injection: (a) technique in a RAG document vs an agent email; (b) carriers, no defense."""
+    base = [r for r in recs if r["env"] == "kaggle" and r["defense"] == "none" and r["kind"] == "attack"]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.0, 2.6), gridspec_kw={"width_ratios": [1, 1.25]})
+    vals = {t: {"rag": rate(base, app="rag", cell=f"{t}@C1"), "agent": rate(base, app="agent", cell=f"{t}@C8")}
+            for t in TECHS}
+    grouped(a1, TECHS, [("rag", "Document in RAG (C1)"), ("agent", "Email to agent (C8)")], vals,
+            [SLOTS[1], SLOTS[3]], "Attack success rate (%)", 95)
+    a1.set_xticks(range(len(TECHS)), TECHS, fontsize=7.5)
+    a1.legend(ncol=1, loc="upper right", fontsize=7)
+    a1.set_title("(a) by technique, pooled over models", fontsize=8, color=MUTED)
+    cells = [("rag", "T7@C1", "C1 visible"), ("rag", "T7@C2", "C2 hidden"), ("rag", "T7@C3", "C3 alt"),
+             ("rag", "T7@C4", "C4 zero-w."), ("rag", "T7@C5", "C5 white"), ("rag", "T7@C6", "C6 tiny"),
+             ("rag", "T7@C7", "C7 meta"), ("agent", "T7@C8", "C8 email"), ("agent", "T7@C9", "C9 web"),
+             ("rag", "H1@C2", "H1 (ours)"), ("rag", "H3@C2+C4", "H3 (ours)")]
+    vals2 = {lab: {"x": rate(base, app=a, cell=c)} for a, c, lab in cells}
+    grouped(a2, [lab for *_, lab in cells], [("x", "T7 unless noted")], vals2, [SLOTS[1]], "", 80)
+    a2.set_xticks(range(len(cells)), [lab for *_, lab in cells], rotation=45, ha="right", fontsize=7)
+    a2.set_title("(b) by carrier (T7 unless noted)", fontsize=8, color=MUTED)
+    fig.tight_layout(w_pad=1.0)
+    save(fig, "fig_indirect")
+
+
+# Values reported in prior work (paper + page, literature/facts.md); not comparable: different prompts and checkers.
+PRIOR = {
+    "direct": [("qwen3-1.7b", 71.3), ("llama3.2-3b", 0.0), ("gemma3-1b", 62.8), ("qwen3-4b", 0.0)],  # P05 p7
+    "pdf": [("C5 white", 50.83), ("C6 tiny", 49.33), ("C7 metadata", 43.17)],                          # P13 p5
+    "ragdef": [("No defense", 24.9), ("All defenses", 4.7)],                                          # P04 p3
+}
+
+
+def fig_prior_vs_ours(recs):
+    base = [r for r in recs if r["env"] == "kaggle" and r["kind"] == "attack"]
+    none = [r for r in base if r["defense"] == "none"]
+    fig, axs = plt.subplots(1, 3, figsize=(7.0, 2.5), gridspec_kw={"width_ratios": [1.35, 1, 0.8]})
+    ours_direct = [rate(none, app="chatbot", model=m) for m in MODELS]
+    ours_pdf = [rate(none, app="rag", cell=c) for c in ("T7@C5", "T7@C6", "T7@C7")]
+    ours_def = [rate(none, app="rag"), rate([r for r in base if r["defense"] == "layered"], app="rag")]
+    panels = [("(a) Direct, same models\nprior: Jaiswal et al.", PRIOR["direct"], ours_direct),
+              ("(b) Indirect, PDF carriers\nprior: Guler and Aydin", PRIOR["pdf"], ours_pdf),
+              ("(c) RAG defense\nprior: Guo and Wei", PRIOR["ragdef"], ours_def)]
+    for ax, (title, prior, ours) in zip(axs, panels):
+        xs = range(len(prior))
+        w = 0.38
+        ax.bar([x - w / 2 for x in xs], [v for _, v in prior], w * 0.92, color="#a7a59c", label="Reported in prior work",
+               zorder=2)
+        ax.bar([x + w / 2 for x in xs], [100 * k / n for k, n in ours], w * 0.92, color=SLOTS[0], label="This work",
+               zorder=2)
+        for x, (_, v), (k, n) in zip(xs, prior, ours):
+            ax.text(x - w / 2, v + 1.5, f"{v:.0f}", ha="center", fontsize=6.3)
+            ax.text(x + w / 2, 100 * k / n + 1.5, f"{100 * k / n:.0f}", ha="center", fontsize=6.3)
+        ax.set_xticks(list(xs), [l for l, _ in prior], fontsize=6.8, rotation=20 if len(prior) > 3 else 0)
+        ax.set_ylim(0, 100)
+        ax.set_title(title, fontsize=7.5, color=MUTED)
+        ax.yaxis.grid(True, color=GRID, linewidth=0.6, zorder=0)
+        ax.set_axisbelow(True)
+    axs[0].set_ylabel("Attack success rate (%)")
+    h, l = axs[0].get_legend_handles_labels()
+    fig.tight_layout(w_pad=0.8, rect=(0, 0, 1, 0.9))
+    fig.legend(h, l, ncol=2, loc="upper center", fontsize=8, frameon=False)
+    save(fig, "fig_prior_vs_ours")
+
+
+def fig_combined(recs):
+    """No defense vs best existing defense (per app) vs layered, per channel and overall."""
+    base = [r for r in recs if r["env"] == "kaggle" and r["kind"] == "attack"]
+    best = {"chatbot": "d1_detector", "rag": "d1_detector", "agent": "d4_toolpolicy"}
+
+    def pooled(apps, which):
+        k = n = 0
+        for a in apps:
+            d = {"none": "none", "layered": "layered", "best": best[a]}[which]
+            kk, nn = rate(base, app=a, defense=d)
+            k, n = k + kk, n + nn
+        return (k, n)
+
+    groups = [("Direct\n(App A)", ["chatbot"]), ("Indirect: RAG\n(App B)", ["rag"]),
+              ("Indirect: agent\n(App C)", ["agent"]), ("All channels", ["chatbot", "rag", "agent"])]
+    vals = {g: {w: pooled(apps, w) for w in ("none", "best", "layered")} for g, apps in groups}
+    fig, ax = plt.subplots(figsize=(7.0, 2.5))
+    grouped(ax, [g for g, _ in groups], [("none", "No defense"), ("best", "Best existing defense (D1 or D4)"),
+                                         ("layered", "Layered defense (ours)")], vals,
+            ["#a7a59c", SLOTS[3], SLOTS[2]], "Attack success rate (%)", 55)
+    ax.set_xticks(range(len(groups)), [g for g, _ in groups], fontsize=8)
+    ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.2), fontsize=8)
+    ax.set_title("Pooled over models and attack cells (Kaggle); whiskers = Wilson 95% CI", fontsize=8.5,
+                 color=MUTED, pad=24)
+    save(fig, "fig_combined")
+
+
 def main():
-    fig_architecture()
     recs = load([ROOT / "results" / "kaggle", ROOT / "results" / "aws"])
     fig_baseline(recs)
+    fig_direct(recs)
+    fig_indirect(recs)
+    fig_prior_vs_ours(recs)
+    fig_combined(recs)
     fig_direct_indirect(recs)
     fig_defenses(recs)
     fig_rag_carriers(recs)
