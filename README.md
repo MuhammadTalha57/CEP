@@ -29,6 +29,10 @@ Models (Ollama 0.40.16, temperature 0, fixed seed per trial): `qwen3-1.7b`, `lla
 | Unicode normalization alone repaired zero-width payloads, so it must come before detection | T7 in zero-width carrier: 7% without defense, 55% with D2 alone, 4% with the layered defense |
 | Moving the same stack to AWS changed wording and latency, not the attack outcome | Same outcome in 1,335 of 1,350 paired trials (98.9%, McNemar p = 1); 22–41x slower on the CPU-only host |
 
+![AWS deployment architecture](reports/figs/fig_aws_architecture.png)
+
+![Direct versus indirect injection](reports/figs/fig_direct_indirect.png)
+
 ![Baseline ASR per model](reports/figs/fig_baseline_asr.png)
 
 ![ASR per defense](reports/figs/fig_defense_asr.png)
@@ -99,6 +103,7 @@ The run plan (6 blocks) is in [`configs/cloud.yaml`](configs/cloud.yaml).
 python -m llmsec.harness.report results/kaggle --defense-table
 python scripts/cloud_compare.py      # reports/cloud_aws.md, paper/cloud_table.tex, paper/cloud_numbers.tex
 python scripts/make_figures.py       # reports/figs/*.png, paper/figs/*.pdf
+python scripts/make_aws_diagram.py   # AWS deployment architecture (paper Figure 2)
 cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
 ```
 
@@ -110,7 +115,7 @@ All attacks targeted only our own applications, mock tools and locally served op
 
 ## Licenses
 
-The Elsevier CAS class files in `paper/` (`cas-dc.cls`, `cas-common.sty`) and `elsarticle-num-names.bst` are distributed under the LaTeX Project Public License (see `paper/ELS-CAS-README.txt` and `paper/manifest.txt`). The reviewed papers themselves are not included; `literature/` holds only our extracted records and page references.
+The Elsevier CAS class files in `paper/` (`cas-dc.cls`, `cas-common.sty`) and `elsarticle-num-names.bst` are distributed under the LaTeX Project Public License (see `paper/ELS-CAS-README.txt` and `paper/manifest.txt`). The icons in `scripts/icons/` are the AWS Architecture Icons and tool logos bundled with the MIT-licensed `diagrams` package. The reviewed papers themselves are not included; `literature/` holds only our extracted records and page references.
 
 ## Project history
 

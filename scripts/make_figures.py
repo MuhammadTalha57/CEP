@@ -200,10 +200,31 @@ def fig_architecture():
     save(fig, "fig_architecture")
 
 
+def fig_direct_indirect(recs):
+    """Direct (App A, user message) versus indirect (Apps B and C, documents and tool outputs), no defense."""
+    base = [r for r in recs if r["env"] == "kaggle" and r["defense"] == "none" and r["kind"] == "attack"]
+    for r in base:
+        r["_ch"] = "direct" if r["app"] == "chatbot" else "indirect"
+    groups = MODELS + ["pooled"]
+    vals = {m: {ch: rate([r for r in base if m == "pooled" or r["model"] == m], _ch=ch)
+                for ch in ("direct", "indirect")} for m in groups}
+    fig, ax = plt.subplots(figsize=(7.0, 2.6))
+    grouped(ax, groups, [("direct", "Direct: user message (App A)"),
+                         ("indirect", "Indirect: documents and tool outputs (Apps B, C)")],
+            vals, [SLOTS[0], SLOTS[1]], "Attack success rate (%)", 100)
+    ax.set_xticks(range(len(groups)), ["qwen3-1.7b", "llama3.2-3b", "gemma3-1b", "qwen3-4b-instruct",
+                                       "Pooled"])
+    ax.legend(ncol=2, loc="upper center", bbox_to_anchor=(0.5, 1.2), fontsize=8)
+    ax.set_title("No defense (Kaggle), attack cells pooled; whiskers = Wilson 95% CI", fontsize=8.5, color=MUTED,
+                 pad=24)
+    save(fig, "fig_direct_indirect")
+
+
 def main():
     fig_architecture()
     recs = load([ROOT / "results" / "kaggle", ROOT / "results" / "aws"])
     fig_baseline(recs)
+    fig_direct_indirect(recs)
     fig_defenses(recs)
     fig_rag_carriers(recs)
     fig_cloud(recs)
